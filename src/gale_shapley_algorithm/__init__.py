@@ -6,7 +6,7 @@ from gale_shapley_algorithm.person import Person, Proposer, Responder
 from gale_shapley_algorithm.result import MatchingResult, StabilityResult
 from gale_shapley_algorithm.stability import check_stability, find_blocking_pairs, is_individually_rational
 
-__version__ = "1.4.1"
+__version__ = "1.5.0"
 __all__ = [
     "Algorithm",
     "MatchingResult",
