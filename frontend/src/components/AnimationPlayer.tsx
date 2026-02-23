@@ -49,6 +49,7 @@ export function AnimationPlayer({
   const phaseInRound = currentPhase > 0 ? (currentPhase - 1) % 3 : -1;
   const currentStep = roundIndex >= 0 && roundIndex < data.steps.length ? data.steps[roundIndex] : null;
   const animationPhase: AnimationPhase = phaseInRound >= 0 ? PHASES[phaseInRound] : 'proposals';
+  const previousStep = roundIndex > 0 ? data.steps[roundIndex - 1] : null;
 
   const stop = useCallback(() => {
     if (intervalRef.current) {
@@ -248,6 +249,7 @@ export function AnimationPlayer({
           canStepBack={currentPhase > 0}
           canStepForward={!isAtEnd}
           isFinalRound={roundIndex === data.steps.length - 1}
+          previousMatches={previousStep?.tentative_matches}
         />
       )}
 

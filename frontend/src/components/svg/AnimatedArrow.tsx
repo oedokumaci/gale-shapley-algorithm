@@ -64,11 +64,11 @@ export function AnimatedArrow({ x1, y1, x2, y2, color, visible, index, dashed }:
       <path
         d={pathD}
         fill="none"
-        stroke={dashed ? stroke : `url(#${gradientId})`}
+        stroke={dashed || color === 'red' ? stroke : `url(#${gradientId})`}
         strokeWidth={2}
         strokeLinecap="round"
         strokeDasharray={dashed ? '6,4' : undefined}
-        strokeOpacity={dashed ? 0.6 : undefined}
+        strokeOpacity={dashed && color !== 'red' ? 0.6 : undefined}
         style={{ transition: 'stroke 0.35s ease' }}
       />
 

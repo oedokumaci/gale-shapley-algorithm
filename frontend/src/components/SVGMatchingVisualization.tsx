@@ -17,6 +17,7 @@ interface SVGMatchingVisualizationProps {
   canStepBack: boolean;
   canStepForward: boolean;
   isFinalRound: boolean;
+  previousMatches?: { proposer: string; responder: string }[];
 }
 
 const VIEW_WIDTH = 900;
@@ -158,6 +159,7 @@ export function SVGMatchingVisualization({
   canStepBack,
   canStepForward,
   isFinalRound,
+  previousMatches,
 }: SVGMatchingVisualizationProps) {
   const maxCount = Math.max(proposerNames.length, responderNames.length, 1);
   const viewHeight = computeViewHeight(maxCount);
@@ -193,7 +195,33 @@ export function SVGMatchingVisualization({
     proposer: string;
     responder: string;
     color: 'neutral' | 'green' | 'red';
+    dashed?: boolean;
   };
+
+  // Background arrows: previous round's tentative matches shown during proposals/responses
+  const bgArrows: ArrowData[] = [];
+  if (!isReady && previousMatches && previousMatches.length > 0 && (phase === 'proposals' || phase === 'responses')) {
+    const currentMatchByResponder = step
+      ? new Map(step.tentative_matches.map((m) => [m.responder, m.proposer]))
+      : new Map<string, string>();
+
+    for (const pm of previousMatches) {
+      let color: 'green' | 'red' = 'green';
+      if (phase === 'responses') {
+        const currentProposer = currentMatchByResponder.get(pm.responder);
+        if (currentProposer !== undefined && currentProposer !== pm.proposer) {
+          color = 'red';
+        }
+      }
+      bgArrows.push({
+        key: `bg-${pm.proposer}-${pm.responder}`,
+        proposer: pm.proposer,
+        responder: pm.responder,
+        color,
+        dashed: true,
+      });
+    }
+  }
 
   const arrows: ArrowData[] = [];
 
@@ -314,6 +342,25 @@ export function SVGMatchingVisualization({
             className="stroke-border" strokeWidth="1" strokeDasharray="3,6" opacity={0.5} />
           <line x1={RESPONDER_X} y1={PADDING_Y - 15} x2={RESPONDER_X} y2={viewHeight - PADDING_Y + 15}
             className="stroke-border" strokeWidth="1" strokeDasharray="3,6" opacity={0.5} />
+
+          {/* Background arrows: previous round's tentative matches */}
+          {bgArrows.map((a, i) => {
+            const py = proposerYMap.get(a.proposer);
+            const ry = responderYMap.get(a.responder);
+            if (py === undefined || ry === undefined) return null;
+            const { ax1, ay1, ax2, ay2 } = arrowEndpoints(
+              PROPOSER_X, py, RESPONDER_X, ry,
+              proposerLayout.radius, responderLayout.radius,
+            );
+            return (
+              <AnimatedArrow
+                key={a.key}
+                x1={ax1} y1={ay1} x2={ax2} y2={ay2}
+                color={a.color} visible={true} index={1000 + i}
+                dashed={true}
+              />
+            );
+          })}
 
           {/* Arrows */}
           {arrows.map((a, i) => {
