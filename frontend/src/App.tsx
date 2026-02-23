@@ -7,7 +7,7 @@ import { SVGMatchingVisualization } from '@/components/SVGMatchingVisualization'
 import { HowItWorksDialog } from '@/components/HowItWorksDialog';
 import { usePersonImages } from '@/hooks/usePersonImages';
 import { runMatching, runMatchingSteps } from '@/api/client';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon, BookOpen, Github } from 'lucide-react';
 import type { MatchingRequest, MatchingResponse, StepsResponse, RoundStep } from '@/types';
 import {
   DEFAULT_PROPOSER_NAMES,
@@ -204,6 +204,16 @@ function App() {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <Button size="icon" variant="ghost" className="h-8 w-8" asChild>
+              <a href="https://oedokumaci.github.io/gale-shapley-algorithm" target="_blank" rel="noopener noreferrer" aria-label="Documentation">
+                <BookOpen className="h-4 w-4" />
+              </a>
+            </Button>
+            <Button size="icon" variant="ghost" className="h-8 w-8" asChild>
+              <a href="https://github.com/oedokumaci/gale-shapley-algorithm" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                <Github className="h-4 w-4" />
+              </a>
+            </Button>
             <Button size="icon" variant="ghost" onClick={toggleTheme} aria-label="Toggle theme" className="h-8 w-8">
               {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
