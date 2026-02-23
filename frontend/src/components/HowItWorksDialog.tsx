@@ -33,81 +33,69 @@ export function HowItWorksDialog() {
             style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}
           >
             <p>
-              In 1962, David Gale and Lloyd Shapley proved that a simple
-              procedure always produces a stable matching in a two-sided market.
-              Each participant on one side ranks everyone on the other side. The
-              algorithm runs in rounds. Every unmatched proposer applies to the
-              highest-ranked person they have not yet approached. Each responder
-              tentatively keeps the most preferred proposal received so far and
-              rejects the rest. Rejected proposers move to their next choice.
-              When no further proposals are made, the tentative matches become
-              final.
+              David Gale and Lloyd Shapley showed in 1962 that a short
+              procedure always finds a stable matching in a two-sided market.
+              Each person on one side ranks everyone on the other side. The
+              algorithm then runs in rounds: every unmatched proposer asks the
+              highest-ranked person they haven't yet approached. Each responder
+              holds onto the best offer received so far and turns down the rest.
+              Rejected proposers move to their next choice. Once no one has
+              anyone left to ask, the held offers become final.
             </p>
 
             <p>
-              The result is stable: there is no blocking pair, meaning no two
-              participants who would both prefer each other over their assigned
-              partners. If the two sides differ in size, or if some matches are
-              unacceptable, some participants may remain unmatched. Stability
-              still holds in the formal sense, because no mutually preferred
-              feasible deviation exists.
+              The outcome is stable, meaning there is no pair of people who
+              would both rather be with each other than with their assigned
+              partners. When the two sides differ in size, some people stay
+              unmatched, but stability still holds: no mutually preferred
+              switch exists.
             </p>
 
             <p>
-              The procedure has a built-in asymmetry. When one side proposes, the
-              outcome is optimal for that side among all stable matchings and
-              least favorable for the responding side among stable matchings.
-              Switching who proposes produces a different stable allocation. The
-              algorithm does not determine which side benefits. That choice is
-              part of the mechanism design.
+              The procedure favors whichever side proposes. Among all stable
+              matchings, the proposing side gets its best possible result and the
+              responding side gets its worst. Swapping who proposes yields a
+              different stable outcome. The algorithm itself is neutral; the
+              choice of who proposes is a design decision.
             </p>
 
             <p>
-              In 2012, Lloyd Shapley and Alvin Roth received the Nobel Memorial
-              Prize in Economic Sciences for the theory of stable allocations and
-              the practice of market design. Shapley developed the theoretical
-              foundations. Roth extended them to real institutions.
+              Lloyd Shapley and Alvin Roth won the 2012 Nobel Prize in Economic
+              Sciences for this work. Shapley built the theory; Roth applied it
+              to real institutions.
             </p>
 
             <p>
-              A centralized system for assigning U.S. medical graduates to
-              residencies emerged in the early 1950s and was formalized as the
-              National Resident Matching Program. Decades later, Roth and
-              collaborators analyzed it through the lens of deferred acceptance
-              and helped redesign it in the late 1990s to better handle modern
-              constraints, including couples applying jointly. The updated
-              mechanism aligned the program more closely with the
+              The U.S. medical residency match, run since the early 1950s as
+              the National Resident Matching Program, is the oldest large-scale
+              application. Roth and collaborators redesigned it in the late 1990s
+              to handle couples applying jointly, bringing it closer to the
               applicant-proposing version of deferred acceptance.
             </p>
 
             <p>
-              Kidney exchange required a different technical extension.
-              Incompatible donor–patient pairs form a directed compatibility
-              graph. Clearinghouses search for disjoint cycles and chains that
-              satisfy medical and logistical constraints, often optimizing for the
-              number of transplants. Although the structure differs from
-              one-to-one matching, the underlying discipline is the same: explicit
-              preferences, clear rules, and a centralized algorithm that prevents
-              mutually beneficial side deals. These exchanges have enabled
-              thousands of additional transplants.
+              Kidney exchange posed a different problem. Incompatible
+              donor-patient pairs form a directed graph, and clearinghouses
+              search for disjoint swap cycles and chains that satisfy medical
+              constraints while maximizing the number of transplants. The
+              structure differs from one-to-one matching, but the principle is
+              the same: state preferences explicitly, run a central algorithm,
+              and prevent side deals. These programs have made thousands of
+              additional transplants possible.
             </p>
 
             <p>
-              Similar ideas reshaped public school assignment in cities such as
-              New York and Boston. Families submit ranked lists of schools.
-              Schools apply priority rules based on criteria such as siblings or
-              location. The redesigned systems reduced strategic gaming and
-              sharply lowered the number of students assigned to schools they had
-              not listed under the prior process.
+              Public school assignment in New York and Boston followed a similar
+              path. Families rank schools; schools apply priority rules based on
+              siblings, distance, and other criteria. The redesigned systems cut
+              strategic gaming and sharply reduced the number of students placed
+              at schools they never listed.
             </p>
 
             <p>
-              What began as an abstract proof about stable allocations became a
-              framework for allocating scarce resources in labor markets,
-              education systems, and organ exchange. The core logic remains
-              unchanged: collect preferences, apply a well-specified procedure,
-              and produce an allocation that no pair can jointly improve upon
-              outside the mechanism.
+              The core logic has not changed since 1962: collect ranked
+              preferences, run the procedure, and produce a matching that no
+              pair can improve on by going around the system.
             </p>
           </div>
         </ScrollArea>
