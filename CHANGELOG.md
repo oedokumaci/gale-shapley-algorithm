@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v1.5.2](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.5.2) - 2026-03-01
+
+<small>[Compare with v1.5.1](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.5.1...v1.5.2)</small>
+
+### Bug Fixes
+
+- add explicit permissions to CI workflow ([27e1265](https://github.com/oedokumaci/gale-shapley-algorithm/commit/27e12655c868dfabe8437d3bbb5d1bf94f77db66) by oedokumaci).
+
 ## [v1.5.1](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.5.1) - 2026-03-01
 
 <small>[Compare with v1.5.0](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.5.0...v1.5.1)</small>
