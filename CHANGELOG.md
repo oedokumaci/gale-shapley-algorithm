@@ -6,6 +6,72 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v1.5.1](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.5.1) - 2026-03-01
+
+<small>[Compare with v1.5.0](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.5.0...v1.5.1)</small>
+
+### Bug Fixes
+
+- resolve 5 Dependabot security alerts in frontend dependencies ([062d729](https://github.com/oedokumaci/gale-shapley-algorithm/commit/062d729187aa1a69d430c2e6a1e74cdbd6e5b700) by oedokumaci).
+
+## [v1.5.0](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.5.0) - 2026-02-23
+
+<small>[Compare with v1.4.1](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.4.1...v1.5.0)</small>
+
+### Features
+
+- show tentative matches in all animation stages ([c56a355](https://github.com/oedokumaci/gale-shapley-algorithm/commit/c56a35557153a69996572c0cee4fb4e35a4d93f3) by oedokumaci).
+- add docs and GitHub links to header ([4765f78](https://github.com/oedokumaci/gale-shapley-algorithm/commit/4765f78ae9a8c22e1f0b3733ac8bdfdf0c4b4ea2) by oedokumaci).
+
+### Bug Fixes
+
+- restore pointer cursor on interactive elements ([682b948](https://github.com/oedokumaci/gale-shapley-algorithm/commit/682b9481b7c2f599decf2d03051ec5aab0353024) by oedokumaci).
+- remove default Vite favicon causing 404 ([2eada46](https://github.com/oedokumaci/gale-shapley-algorithm/commit/2eada46b82c4859923a5221bc2739136198fd0b6) by oedokumaci).
+
+## [v1.4.1](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.4.1) - 2026-02-20
+
+<small>[Compare with v1.4.0](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.4.0...v1.4.1)</small>
+
+## [v1.4.0](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.4.0) - 2026-02-20
+
+<small>[Compare with v1.3.2](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.3.2...v1.4.0)</small>
+
+### Features
+
+- add Clear All button to GUI editor (closes #29) ([cbb5834](https://github.com/oedokumaci/gale-shapley-algorithm/commit/cbb583459025591cbe834d34ad8647f9ef58630a) by oedokumaci).
+
+## [v1.3.2](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.3.2) - 2026-02-20
+
+<small>[Compare with v1.3.1](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.3.1...v1.3.2)</small>
+
+### Bug Fixes
+
+- show warning for duplicate names in GUI editor (closes #28) ([8a16033](https://github.com/oedokumaci/gale-shapley-algorithm/commit/8a16033c1ebee1f32f893a12b50f2cc0b8e1767c) by oedokumaci).
+
+## [v1.3.1](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.3.1) - 2026-02-20
+
+<small>[Compare with v1.3.0](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.3.0...v1.3.1)</small>
+
+### Bug Fixes
+
+- allow empty preference ranking in CLI (closes #27) ([a8aec10](https://github.com/oedokumaci/gale-shapley-algorithm/commit/a8aec10c1484c524f514234fa4d4f13fa41ee4b6) by oedokumaci).
+
+## [v1.3.0](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.3.0) - 2026-02-20
+
+<small>[Compare with v1.2.3](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.2.3...v1.3.0)</small>
+
+### Features
+
+- run algorithm twice with --swap-sides (closes #26) ([1572ea3](https://github.com/oedokumaci/gale-shapley-algorithm/commit/1572ea3eab5210e3f8f11443cbea506f4e715895) by oedokumaci).
+
+## [v1.2.3](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.2.3) - 2026-02-20
+
+<small>[Compare with v1.2.2](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.2.2...v1.2.3)</small>
+
+### Build
+
+- bump hono ([3b9e174](https://github.com/oedokumaci/gale-shapley-algorithm/commit/3b9e174861ac61d114e48ea25ac43c098aca0bc2) by dependabot[bot]).
+
 ## [v1.2.2](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.2.2) - 2026-02-20
 
 <small>[Compare with v1.2.1](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.2.1...v1.2.2)</small>
