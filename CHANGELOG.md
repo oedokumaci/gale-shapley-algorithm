@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v1.5.3](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.5.3) - 2026-03-04
+
+<small>[Compare with v1.5.2](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.5.2...v1.5.3)</small>
+
+### Security
+
+- bump @hono/node-server from 1.19.9 to 1.19.10 and hono from 4.12.3 to 4.12.5 to fix authorization bypass, SSE injection, cookie attribute injection, and serve static middleware bypass vulnerabilities ([8697c8f](https://github.com/oedokumaci/gale-shapley-algorithm/commit/8697c8f7a599e196d134199ce953c2df35510e20) by dependabot[bot]).
+
 ## [v1.5.2](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.5.2) - 2026-03-01
 
 <small>[Compare with v1.5.1](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.5.1...v1.5.2)</small>
