@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v1.5.5](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.5.5) - 2026-03-25
+
+<small>[Compare with v1.5.4](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.5.4...v1.5.5)</small>
+
+### Security
+
+- bump express-rate-limit from 8.2.1 to 8.3.1 to fix IPv4-mapped IPv6 address bypass for per-client rate limiting ([ee60527](https://github.com/oedokumaci/gale-shapley-algorithm/commit/ee60527)).
+- bump flatted from 3.3.3 to 3.4.2 to fix unbounded recursion DoS and prototype pollution in `parse()` ([ee60527](https://github.com/oedokumaci/gale-shapley-algorithm/commit/ee60527)).
+
+### Bug Fixes
+
+- fix ty typecheck task to use project venv for resolving optional dependencies ([ee60527](https://github.com/oedokumaci/gale-shapley-algorithm/commit/ee60527)).
+
 ## [v1.5.4](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.5.4) - 2026-03-19
 
 <small>[Compare with v1.5.3](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.5.3...v1.5.4)</small>
