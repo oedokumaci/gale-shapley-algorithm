@@ -97,7 +97,7 @@ lint = { cmd = "uvx ruff check --config=config/ruff.toml --fix {all}", help = "L
 fix = { cmd = "task format && task lint", help = "Format + lint auto-fix" }
 
 # Type checking
-typecheck = { cmd = "uvx ty check --config-file=config/ty.toml {src}", help = "Run type checking" }
+typecheck = { cmd = "uvx ty check --config-file=config/ty.toml --venv .venv {src}", help = "Run type checking" }
 
 # Quality checks (read-only, for CI)
 format_check = { cmd = "uvx ruff format --config=config/ruff.toml --check {all}", help = "Check code formatting (CI)" }
