@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v1.5.6](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.5.6) - 2026-03-26
+
+<small>[Compare with v1.5.5](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.5.5...v1.5.6)</small>
+
+### Security
+
+- bump picomatch from 4.0.3 to 4.0.4 and from 2.3.1 to 2.3.2 to fix CVE-2026-33671 and CVE-2026-33672 ([68dbb1b](https://github.com/oedokumaci/gale-shapley-algorithm/commit/68dbb1ba7252fa2d568b7e87213b76d47163ee4a) by dependabot[bot]).
+
 ## [v1.5.5](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.5.5) - 2026-03-25
 
 <small>[Compare with v1.5.4](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.5.4...v1.5.5)</small>
