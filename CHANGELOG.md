@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v1.5.7](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.5.7) - 2026-04-07
+
+<small>[Compare with v1.5.6](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.5.6...v1.5.7)</small>
+
+### Bug Fixes
+
+- remove stale ty: ignore directive to fix CI ([986230e](https://github.com/oedokumaci/gale-shapley-algorithm/commit/986230e578b38a4a09753a169162b236aa3c0c34) by oedokumaci).
+
+### Build
+
+- bump vite ([8a71517](https://github.com/oedokumaci/gale-shapley-algorithm/commit/8a7151771bc9791079d1a3d4b4c2f50d7af32e57) by dependabot[bot]).
+
 ## [v1.5.6](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.5.6) - 2026-03-26
 
 <small>[Compare with v1.5.5](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.5.5...v1.5.6)</small>
@@ -25,23 +37,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Bug Fixes
 
-- fix ty typecheck task to use project venv for resolving optional dependencies ([ee60527](https://github.com/oedokumaci/gale-shapley-algorithm/commit/ee60527)).
+- pass --venv to ty typecheck and suppress false positive ([02afa1e](https://github.com/oedokumaci/gale-shapley-algorithm/commit/02afa1e9cefce54f0720bf837cce7281f6747e8b) by Claude).
+- bump express-rate-limit and flatted to fix high-severity vulnerabilities ([a377af3](https://github.com/oedokumaci/gale-shapley-algorithm/commit/a377af307481f01216a73794dc30b4e340f0554d) by Claude).
 
 ## [v1.5.4](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.5.4) - 2026-03-19
 
 <small>[Compare with v1.5.3](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.5.3...v1.5.4)</small>
 
-### Security
+### Build
 
-- bump hono from 4.12.5 to 4.12.7 to fix prototype pollution via `__proto__` key in `parseBody({ dot: true })` ([020c880](https://github.com/oedokumaci/gale-shapley-algorithm/commit/020c880ec575d7e383cbf3b0c6ef734b8a7057ea) by dependabot[bot]).
+- bump hono ([020c880](https://github.com/oedokumaci/gale-shapley-algorithm/commit/020c880ec575d7e383cbf3b0c6ef734b8a7057ea) by dependabot[bot]).
 
 ## [v1.5.3](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.5.3) - 2026-03-04
 
 <small>[Compare with v1.5.2](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.5.2...v1.5.3)</small>
 
-### Security
+### Build
 
-- bump @hono/node-server from 1.19.9 to 1.19.10 and hono from 4.12.3 to 4.12.5 to fix authorization bypass, SSE injection, cookie attribute injection, and serve static middleware bypass vulnerabilities ([8697c8f](https://github.com/oedokumaci/gale-shapley-algorithm/commit/8697c8f7a599e196d134199ce953c2df35510e20) by dependabot[bot]).
+- bump the npm_and_yarn group across 1 directory with 2 updates ([4f0df8a](https://github.com/oedokumaci/gale-shapley-algorithm/commit/4f0df8af8b6d71836b60d4659c23436b40a03cda) by dependabot[bot]).
 
 ## [v1.5.2](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.5.2) - 2026-03-01
 
