@@ -25,6 +25,15 @@ updates:
     groups:
       npm_and_yarn:
         patterns: ["*"]
+    # The frontend has no automated test coverage, so major bumps on icon /
+    # type-system packages that tend to ship breaking renames or removals
+    # are ignored here and should be handled via a targeted PR that reviews
+    # the migration. Minor / patch updates still flow through.
+    ignore:
+      - dependency-name: "lucide-react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
     commit-message:
       prefix: "build(deps)"
       prefix-development: "build(deps-dev)"
