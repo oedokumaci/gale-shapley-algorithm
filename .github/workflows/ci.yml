@@ -96,7 +96,7 @@ jobs:
         cache-dependency-glob: pyproject.toml
 
     - name: Install dependencies
-      run: uv sync --extra cli --extra gui --python ${{ matrix.python-version }}
+      run: uv sync --extra cli --extra gui --extra numeric --python ${{ matrix.python-version }}
 
     - name: Download objects inventory
       uses: actions/download-artifact@v6

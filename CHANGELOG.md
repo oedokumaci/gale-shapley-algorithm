@@ -6,6 +6,27 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v1.6.0](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.6.0) - 2026-04-17
+
+<small>[Compare with v1.5.7](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.5.7...v1.6.0)</small>
+
+### Features
+
+- **New `numeric` subpackage** for numpy-backed primitives (`gale_shapley_algorithm.numeric`). Install the `numeric` extra (`pip install "gale-shapley-algorithm[numeric]"`) to pull in numpy as a dependency. The core remains zero-dep.
+    - `numeric.gs.gale_shapley` / `men_optimal_gs` / `women_optimal_gs`: fast numpy deferred acceptance on int16 rank matrices.
+    - `numeric.stability.is_stable` / `find_blocking_pairs` / `is_stable_batch`: single-matching and vectorized stability checks. The batched variant filters all K candidate matchings in one tensor operation.
+    - `numeric.lattice.enumerate_stable_matchings`: full stable-matching lattice enumeration via batched brute force. Default `max_n=10`; a rotation-based enumerator that scales past n=50 (Gusfield-Irving 1989) is documented as future work.
+    - Cross-validated against the existing `Algorithm`/`Proposer`/`Responder` API on random instances; numeric subpackage at 100% test coverage.
+
+### Tests / CI
+
+- Install the `numeric` extra in the CI test job so numpy-backed tests run against a real numpy install on every supported matrix cell.
+
+### Docs
+
+- README + docs landing page now include a "Numerical / large-scale usage" section with a runnable snippet.
+- New `examples/numeric_usage.py` demonstrating rank-matrix GS, stability checks, and lattice enumeration.
+
 ## [v1.5.7](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.5.7) - 2026-04-07
 
 <small>[Compare with v1.5.6](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.5.6...v1.5.7)</small>

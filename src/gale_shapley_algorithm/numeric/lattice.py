@@ -28,8 +28,7 @@ try:
     import numpy as np
 except ImportError as e:  # pragma: no cover
     raise ImportError(
-        "The `numeric` subpackage requires numpy. Install with "
-        "`pip install gale-shapley-algorithm[numeric]`.",
+        "The `numeric` subpackage requires numpy. Install with `pip install gale-shapley-algorithm[numeric]`.",
     ) from e
 
 from gale_shapley_algorithm.numeric.stability import is_stable_batch
@@ -85,11 +84,13 @@ def enumerate_stable_matchings(
             "A rotation-based enumerator is planned; for now, raise max_n "
             "explicitly if you accept the O(n!) runtime and O(batch_size * n**2) memory.",
         )
-    stable_rows: list[NDArray[np.int16]] = []
+    # Seed with an empty (0, n) array so np.concatenate always has something to
+    # concatenate even if every batch happened to contain no stable matchings.
+    # For valid strict complete SMP this seed is never the only contributor —
+    # at least the men-optimal matching is stable.
+    stable_rows: list[NDArray[np.int16]] = [np.empty((0, n), dtype=np.int16)]
     for batch in _permutation_batches(n, batch_size):
         mask = is_stable_batch(men_rank, women_rank, batch)
         if bool(mask.any()):
             stable_rows.append(batch[mask])
-    if not stable_rows:
-        return np.empty((0, n), dtype=np.int16)
     return np.concatenate(stable_rows, axis=0)

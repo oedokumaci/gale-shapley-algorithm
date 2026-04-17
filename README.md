@@ -53,6 +53,12 @@ With CLI support:
 pip install "gale-shapley-algorithm[cli]"
 ```
 
+With numpy-backed primitives for large-scale / numerical work (adds `numpy >= 2.0`):
+
+```bash
+pip install "gale-shapley-algorithm[numeric]"
+```
+
 ## Quick Start
 
 ### As a Library
@@ -72,6 +78,30 @@ result = gsa.create_matching(
 )
 print(result.matches)  # {'alice': 'bob', 'dave': 'charlie'}
 ```
+
+### Numerical / large-scale usage
+
+For high-throughput work (many random instances, enumerating the stable-matching lattice, using the output as input to downstream ML/RL pipelines), the `numeric` subpackage provides numpy-array APIs:
+
+```python
+import numpy as np
+from gale_shapley_algorithm.numeric import (
+    gale_shapley, men_optimal_gs, women_optimal_gs,
+    is_stable, find_blocking_pairs, enumerate_stable_matchings,
+)
+
+# Rank matrices: men_rank[i, j] is woman j's 1-indexed position on man i's list.
+men_rank   = np.array([[1, 2, 3], [3, 1, 2], [2, 3, 1]], dtype=np.int16)
+women_rank = np.array([[3, 1, 2], [1, 3, 2], [2, 1, 3]], dtype=np.int16)
+
+mo = men_optimal_gs(men_rank, women_rank)    # match[m] = w
+wo = women_optimal_gs(men_rank, women_rank)
+lattice = enumerate_stable_matchings(men_rank, women_rank)  # (|L|, n) int16 array
+```
+
+See `examples/numeric_usage.py` for a more complete walk-through. The lattice enumerator
+handles up to n=10 via batched brute force; a rotation-based enumerator that scales past
+n=50 is documented as future work.
 
 ### As a CLI
 

@@ -8,8 +8,7 @@ try:
     import numpy as np
 except ImportError as e:  # pragma: no cover
     raise ImportError(
-        "The `numeric` subpackage requires numpy. Install with "
-        "`pip install gale-shapley-algorithm[numeric]`.",
+        "The `numeric` subpackage requires numpy. Install with `pip install gale-shapley-algorithm[numeric]`.",
     ) from e
 
 if TYPE_CHECKING:

@@ -135,6 +135,29 @@ def test_gs_rejects_mismatched_shapes() -> None:
         gale_shapley(np.zeros((3, 3), dtype=np.int16), np.zeros((4, 4), dtype=np.int16))
 
 
+def test_is_stable_false_on_wrong_length_match() -> None:
+    men_rank = np.array([[1, 2], [2, 1]], dtype=np.int16)
+    women_rank = np.array([[1, 2], [2, 1]], dtype=np.int16)
+    short_match = np.array([0], dtype=np.int16)
+    assert is_stable(men_rank, women_rank, short_match) is False
+
+
+def test_is_stable_false_on_duplicate_partners() -> None:
+    men_rank = np.array([[1, 2], [2, 1]], dtype=np.int16)
+    women_rank = np.array([[1, 2], [2, 1]], dtype=np.int16)
+    not_a_permutation = np.array([0, 0], dtype=np.int16)
+    assert is_stable(men_rank, women_rank, not_a_permutation) is False
+
+
+def test_is_stable_batch_shape() -> None:
+    men_rank = np.array([[1, 2, 3], [3, 1, 2], [2, 3, 1]], dtype=np.int16)
+    women_rank = np.array([[3, 1, 2], [1, 3, 2], [2, 1, 3]], dtype=np.int16)
+    matchings = np.array([[0, 1, 2], [1, 2, 0], [2, 0, 1]], dtype=np.int16)
+    mask = is_stable_batch(men_rank, women_rank, matchings)
+    assert mask.shape == (3,)
+    assert mask.dtype == np.bool_
+
+
 def test_lattice_is_batched_at_n10() -> None:
     """Smoke test: brute-force enumeration completes at n=10 (3.6M perms) with default batch size."""
     rng = np.random.default_rng(7)

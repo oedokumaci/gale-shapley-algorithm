@@ -20,7 +20,10 @@ Data convention (all functions):
 
 Example:
     >>> import numpy as np
-    >>> from gale_shapley_algorithm.numeric import gale_shapley, enumerate_stable_matchings
+    >>> from gale_shapley_algorithm.numeric import (
+    ...     gale_shapley,
+    ...     enumerate_stable_matchings,
+    ... )
     >>> proposer_rank = np.array([[1, 2, 3], [3, 1, 2], [2, 3, 1]], dtype=np.int16)
     >>> responder_rank = np.array([[3, 1, 2], [1, 3, 2], [2, 1, 3]], dtype=np.int16)
     >>> match = gale_shapley(proposer_rank, responder_rank)
