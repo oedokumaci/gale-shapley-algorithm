@@ -29,7 +29,8 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
-cli = ["typer>=0.9.0", "rich>=13.0"]
+# Bounds verified by CI's test-min-deps job (uv --resolution lowest-direct).
+cli = ["typer>=0.12", "rich>=13.0"]
 gui = ["fastapi>=0.115", "uvicorn[standard]>=0.30"]
 numeric = ["numpy>=2.0"]
 dev = ["gale-shapley-algorithm[cli]", "pre-commit>=3.0", "ruff>=0.9"]
