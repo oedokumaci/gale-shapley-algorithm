@@ -106,3 +106,39 @@ jobs:
 
     - name: Run tests
       run: uv run --python ${{ matrix.python-version }} pytest -c config/pytest.ini
+
+  test-min-deps:
+    # Verify the declared lower bounds on optional-extra dependencies actually work.
+    # uv's lowest-direct resolution pins each declared dep to its minimum version.
+    needs: quality
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+        fetch-tags: true
+
+    - name: Setup Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: "3.12"
+
+    - name: Setup uv
+      uses: astral-sh/setup-uv@v7
+      with:
+        enable-cache: true
+        cache-dependency-glob: pyproject.toml
+
+    - name: Install dependencies (lowest-direct resolution)
+      run: uv sync --extra cli --extra gui --extra numeric --resolution lowest-direct
+
+    - name: Download objects inventory
+      uses: actions/download-artifact@v6
+      with:
+        name: objects.inv
+        path: site/
+
+    - name: Run tests
+      run: uv run pytest -c config/pytest.ini

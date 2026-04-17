@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "gale-shapley-algorithm: A Python implementation of the Gale-Shapley algorithm"
+authors:
+  - family-names: Dokumaci
+    given-names: Oral Ersoy
+    email: oral.ersoy.dokumaci@gmail.com
+    orcid: null
+type: software
+license: MIT
+repository-code: "https://github.com/oedokumaci/gale-shapley-algorithm"
+url: "https://oedokumaci.github.io/gale-shapley-algorithm"
+abstract: >
+  A Python implementation of the Gale-Shapley (Deferred Acceptance) algorithm for
+  the stable marriage problem. Provides both a symbolic Algorithm/Proposer/Responder
+  API and, via the optional numeric extra, a numpy-backed subpackage with fast GS,
+  vectorized stability checks, and stable-matching lattice enumeration.
+keywords:
+  - gale-shapley
+  - deferred-acceptance
+  - stable-matching
+  - matching-theory
+  - two-sided-matching
+version: 1.6.0
+date-released: "2026-04-17"

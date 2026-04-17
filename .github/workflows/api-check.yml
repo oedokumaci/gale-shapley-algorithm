@@ -1,0 +1,49 @@
+name: api-check
+
+# Detects breaking public-API changes between a PR and main by diffing Griffe
+# snapshots. A missing, renamed, or signature-changed public symbol should
+# force either a backwards-compatible redesign or a deliberate major version
+# bump - this job surfaces either case before merge.
+
+on:
+  pull_request:
+    branches:
+    - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  griffe-check:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+        fetch-tags: true
+
+    - name: Setup Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: "3.13"
+
+    - name: Setup uv
+      uses: astral-sh/setup-uv@v7
+      with:
+        enable-cache: true
+        cache-dependency-glob: pyproject.toml
+
+    - name: Install dependencies (including all optional extras so Griffe can resolve every symbol)
+      run: uv sync --extra cli --extra gui --extra numeric
+
+    - name: Check public API against main
+      run: uv run --with griffe griffe check gale_shapley_algorithm --search src --against origin/main
