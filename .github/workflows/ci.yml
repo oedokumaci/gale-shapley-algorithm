@@ -49,7 +49,7 @@ jobs:
         cache-dependency-glob: pyproject.toml
 
     - name: Install dependencies
-      run: uvx --from taskipy task setup
+      run: uv sync --extra cli --extra gui --extra numeric
 
     - name: Check code formatting
       run: uvx --from taskipy task format_check
