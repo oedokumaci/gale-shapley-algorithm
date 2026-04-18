@@ -31,11 +31,17 @@ Example:
 """
 
 from gale_shapley_algorithm.numeric.gs import gale_shapley, men_optimal_gs, women_optimal_gs
-from gale_shapley_algorithm.numeric.lattice import enumerate_stable_matchings
+from gale_shapley_algorithm.numeric.lattice import (
+    apply_rotation,
+    enumerate_stable_matchings,
+    exposed_rotations,
+)
 from gale_shapley_algorithm.numeric.stability import find_blocking_pairs, is_stable
 
 __all__ = [
+    "apply_rotation",
     "enumerate_stable_matchings",
+    "exposed_rotations",
     "find_blocking_pairs",
     "gale_shapley",
     "is_stable",

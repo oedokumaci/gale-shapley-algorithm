@@ -88,6 +88,7 @@ import numpy as np
 from gale_shapley_algorithm.numeric import (
     gale_shapley, men_optimal_gs, women_optimal_gs,
     is_stable, find_blocking_pairs, enumerate_stable_matchings,
+    exposed_rotations, apply_rotation,
 )
 
 # Rank matrices: men_rank[i, j] is woman j's 1-indexed position on man i's list.
@@ -97,11 +98,16 @@ women_rank = np.array([[3, 1, 2], [1, 3, 2], [2, 1, 3]], dtype=np.int16)
 mo = men_optimal_gs(men_rank, women_rank)    # match[m] = w
 wo = women_optimal_gs(men_rank, women_rank)
 lattice = enumerate_stable_matchings(men_rank, women_rank)  # (|L|, n) int16 array
+
+# Step through the lattice manually:
+for rotation in exposed_rotations(men_rank, women_rank, mo):
+    next_matching = apply_rotation(mo, rotation)
+    assert is_stable(men_rank, women_rank, next_matching)
 ```
 
-See `examples/numeric_usage.py` for a more complete walk-through. The lattice enumerator
-handles up to n=10 via batched brute force; a rotation-based enumerator that scales past
-n=50 is documented as future work.
+See `examples/numeric_usage.py` for a more complete walk-through. `enumerate_stable_matchings`
+defaults to the Gusfield-Irving rotation algorithm and scales past `n=50`; the brute-force method
+remains available via `method="brute"` as a correctness oracle for small instances.
 
 ### As a CLI
 

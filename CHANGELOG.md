@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v1.7.0](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.7.0) - 2026-04-18
+
+<small>[Compare with v1.6.0](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.6.0...v1.7.0)</small>
+
+### Features
+
+- **Rotation-based stable-matching-lattice enumeration** (Gusfield-Irving 1989) in `gale_shapley_algorithm.numeric.lattice`. Scales comfortably past `n=50`; runtime is `O(n**2 + |L| * n**2)` where `|L|` is the number of stable matchings. `enumerate_stable_matchings` now defaults to `method="rotation"`; the previous vectorized brute-force is still available via `method="brute"` (useful as a correctness oracle).
+- **Public rotation primitives** `exposed_rotations(men_rank, women_rank, matching)` and `apply_rotation(matching, rotation)`. Given a stable matching, `exposed_rotations` returns the currently-applicable rotations; `apply_rotation` takes one step down the lattice. These are the building blocks for any algorithm that navigates the lattice (search, incremental maintenance under preference changes, learned policies).
+- Cross-validated against brute force on random `n=3..7` instances; full set equality in every case. New tests also confirm `exposed_rotations` is empty at the women-optimal matching, non-empty at the men-optimal when the lattice has more than one matching, and that applying any exposed rotation produces a stable matching different from the starting one.
+
+### Tests / CI
+
+- 18 tests pass (up from 13); 100% coverage on the `numeric` subpackage retained.
+- New scaling smoke test at `n=20` (impossible for the brute-force method to reach — `20! = 2.4e18`).
+
 ## [v1.6.0](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.6.0) - 2026-04-17
 
 <small>[Compare with v1.5.7](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.5.7...v1.6.0)</small>

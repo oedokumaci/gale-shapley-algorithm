@@ -15,7 +15,9 @@ import pytest
 
 from gale_shapley_algorithm import Algorithm, Proposer, Responder
 from gale_shapley_algorithm.numeric import (
+    apply_rotation,
     enumerate_stable_matchings,
+    exposed_rotations,
     find_blocking_pairs,
     gale_shapley,
     is_stable,
@@ -158,20 +160,75 @@ def test_is_stable_batch_shape() -> None:
     assert mask.dtype == np.bool_
 
 
-def test_lattice_is_batched_at_n10() -> None:
-    """Smoke test: brute-force enumeration completes at n=10 (3.6M perms) with default batch size."""
-    rng = np.random.default_rng(7)
-    men, women = _random_instance(10, rng)
-    lattice = enumerate_stable_matchings(men, women, max_n=10)
-    assert lattice.shape[0] >= 1
-    assert lattice.shape[1] == 10
-    for k in range(lattice.shape[0]):
-        assert is_stable(men, women, lattice[k])
+def test_lattice_matches_brute_force_on_random_instances(rng: np.random.Generator) -> None:
+    """For every random n<=7 instance, rotation-based and brute-force enumeration return the same set."""
+    for n in (3, 4, 5, 6, 7):
+        for _ in range(8):
+            men, women = _random_instance(n, rng)
+            rot_set = {tuple(int(x) for x in row) for row in enumerate_stable_matchings(men, women, method="rotation")}
+            brute_set = {tuple(int(x) for x in row) for row in enumerate_stable_matchings(men, women, method="brute")}
+            assert rot_set == brute_set, (men, women, rot_set, brute_set)
 
 
-def test_lattice_refuses_above_max_n() -> None:
-    """Default max_n is 10. n=11 should raise unless max_n is explicitly raised."""
+def test_brute_force_refuses_above_max_n() -> None:
+    """Brute force is explicitly capped at max_n to avoid n!-runaway."""
     rng = np.random.default_rng(7)
     men, women = _random_instance(11, rng)
     with pytest.raises(ValueError, match="max_n"):
-        enumerate_stable_matchings(men, women)
+        enumerate_stable_matchings(men, women, method="brute")
+
+
+def test_rotation_enumeration_scales_past_brute_force() -> None:
+    """n=20 is far beyond brute force's n!=2.4e18 but rotation BFS handles it."""
+    rng = np.random.default_rng(13)
+    men, women = _random_instance(20, rng)
+    lattice = enumerate_stable_matchings(men, women, method="rotation")
+    assert lattice.shape[0] >= 1
+    assert lattice.shape[1] == 20
+    # Check a few of the returned matchings are actually stable.
+    for k in range(min(lattice.shape[0], 5)):
+        assert is_stable(men, women, lattice[k])
+
+
+def test_exposed_rotations_empty_at_women_optimal(rng: np.random.Generator) -> None:
+    """No rotation is exposed at the women-optimal matching (infimum of the lattice)."""
+    men, women = _random_instance(6, rng)
+    wo = women_optimal_gs(men, women)
+    assert exposed_rotations(men, women, wo) == []
+
+
+def test_exposed_rotations_nonempty_at_men_optimal_when_lattice_has_multiple_matchings(
+    rng: np.random.Generator,
+) -> None:
+    """If the lattice has more than one stable matching, the men-optimal matching must expose at least one rotation."""
+    for _ in range(20):
+        men, women = _random_instance(6, rng)
+        lattice = enumerate_stable_matchings(men, women, method="brute")
+        mo = men_optimal_gs(men, women)
+        rotations = exposed_rotations(men, women, mo)
+        if lattice.shape[0] > 1:
+            assert len(rotations) >= 1
+
+
+def test_apply_rotation_produces_stable_matching(rng: np.random.Generator) -> None:
+    """Applying any exposed rotation to a stable matching yields another stable matching."""
+    for _ in range(30):
+        men, women = _random_instance(6, rng)
+        mo = men_optimal_gs(men, women)
+        for rot in exposed_rotations(men, women, mo):
+            new_match = apply_rotation(mo, rot)
+            assert is_stable(men, women, new_match)
+            # And it should be strictly different from mo.
+            assert not np.array_equal(new_match, mo)
+
+
+def test_apply_rotation_does_not_mutate_input(rng: np.random.Generator) -> None:
+    men, women = _random_instance(5, rng)
+    mo = men_optimal_gs(men, women)
+    mo_copy = mo.copy()
+    rotations = exposed_rotations(men, women, mo)
+    if rotations:
+        rotation_copy = rotations[0].copy()
+        _ = apply_rotation(mo, rotations[0])
+        assert np.array_equal(mo, mo_copy)
+        assert np.array_equal(rotations[0], rotation_copy)
