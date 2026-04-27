@@ -82,10 +82,7 @@ def gale_shapley(proposer_rank: NDArray[np.integer], responder_rank: NDArray[np.
             free.append(current)
         else:
             free.append(p)
-    match = np.empty(n, dtype=np.int16)
-    for r in range(n):
-        match[int(responder_match[r])] = r
-    return match
+    return np.argsort(responder_match).astype(np.int16)
 
 
 def men_optimal_gs(men_rank: NDArray[np.integer], women_rank: NDArray[np.integer]) -> NDArray[np.int16]:
@@ -95,9 +92,4 @@ def men_optimal_gs(men_rank: NDArray[np.integer], women_rank: NDArray[np.integer
 
 def women_optimal_gs(men_rank: NDArray[np.integer], women_rank: NDArray[np.integer]) -> NDArray[np.int16]:
     """Return the women-optimal stable matching, still in men-indexed form ``match[m] = w``."""
-    women_side = gale_shapley(women_rank, men_rank)  # women_side[w] = m
-    n = women_rank.shape[0]
-    match = np.empty(n, dtype=np.int16)
-    for w in range(n):
-        match[int(women_side[w])] = w
-    return match
+    return np.argsort(gale_shapley(women_rank, men_rank)).astype(np.int16)
