@@ -54,14 +54,6 @@ class Person:
         """Returns True if the person is matched to someone or self, False if match is None."""
         return bool(self.match)
 
-    @is_matched.setter
-    def is_matched(self, value: bool) -> None:
-        match value:
-            case False:
-                self.match = None
-            case True:
-                raise ValueError("is_matched attribute can only be set to False")
-
 
 class Proposer(Person):
     """Proposer class, subclass of Person."""
@@ -131,7 +123,7 @@ class Responder(Person):
                 case Proposer() as current_match:
                     new_match = self._most_preferred(self.acceptable_proposals + [current_match])
                     if new_match != current_match:
-                        current_match.is_matched = False
+                        current_match.match = None
                         self.match = new_match
                         new_match.match = self
                 case _:
