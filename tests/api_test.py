@@ -93,6 +93,30 @@ class TestMatching:
         assert data["self_matches"] == []
         assert data["unmatched"] == []
 
+    def test_rejects_unknown_responder_name(self, client: TestClient) -> None:
+        """A typo in a proposer's preference list must not silently self-match."""
+        response = client.post(
+            "/api/matching",
+            json={
+                "proposer_preferences": {"alice": ["bob_typo"]},
+                "responder_preferences": {"bob": ["alice"]},
+            },
+        )
+        assert response.status_code == 422
+        assert "bob_typo" in response.text
+
+    def test_rejects_unknown_proposer_name(self, client: TestClient) -> None:
+        """A typo in a responder's preference list must not silently self-match."""
+        response = client.post(
+            "/api/matching",
+            json={
+                "proposer_preferences": {"alice": ["bob"]},
+                "responder_preferences": {"bob": ["alice_typo"]},
+            },
+        )
+        assert response.status_code == 422
+        assert "alice_typo" in response.text
+
 
 class TestMatchingSteps:
     """Tests for the POST /api/matching/steps endpoint."""
