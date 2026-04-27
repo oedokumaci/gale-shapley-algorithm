@@ -16,21 +16,19 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
 
-def gale_shapley(proposer_rank: NDArray[np.integer], responder_rank: NDArray[np.integer]) -> NDArray[np.int16]:
-    """Run proposer-optimal deferred acceptance.
+def _validate_rank_matrices(
+    proposer_rank: NDArray[np.integer],
+    responder_rank: NDArray[np.integer],
+) -> None:
+    """Validate that two rank matrices are square, same-shape, and have permutation rows.
 
-    Args:
-        proposer_rank: ``(n, n)`` array where ``proposer_rank[i, j]`` is
-            the 1-indexed position of responder ``j`` in proposer ``i``'s
-            preference list.
-        responder_rank: ``(n, n)`` array with the symmetric convention.
-
-    Returns:
-        ``match`` of shape ``(n,)``, dtype ``int16``, where ``match[i]`` is
-        the responder paired with proposer ``i``.
+    Each row must be a strict permutation of ``1..n`` per the data convention
+    documented in :mod:`gale_shapley_algorithm.numeric`. Without this check,
+    non-permutation input silently produces a wrong matching downstream.
 
     Raises:
-        ValueError: if the two arrays don't have the same square shape.
+        ValueError: if shapes mismatch, are non-square, or any row is not a
+            permutation of ``1..n``.
     """
     if proposer_rank.shape != responder_rank.shape:
         raise ValueError(
@@ -38,7 +36,35 @@ def gale_shapley(proposer_rank: NDArray[np.integer], responder_rank: NDArray[np.
         )
     if proposer_rank.ndim != 2 or proposer_rank.shape[0] != proposer_rank.shape[1]:
         raise ValueError(f"Rank matrices must be square; got {proposer_rank.shape}.")
+    n = proposer_rank.shape[0]
+    expected = np.arange(1, n + 1, dtype=proposer_rank.dtype)
+    for name, mat in (("proposer_rank", proposer_rank), ("responder_rank", responder_rank)):
+        ok_per_row = (np.sort(mat, axis=1) == expected).all(axis=1)
+        if not ok_per_row.all():
+            bad_row = int(np.argmin(ok_per_row))
+            raise ValueError(
+                f"{name} row {bad_row} must be a permutation of 1..{n}; got {mat[bad_row].tolist()!r}.",
+            )
 
+
+def gale_shapley(proposer_rank: NDArray[np.integer], responder_rank: NDArray[np.integer]) -> NDArray[np.int16]:
+    """Run proposer-optimal deferred acceptance.
+
+    Args:
+        proposer_rank: ``(n, n)`` array where ``proposer_rank[i, j]`` is
+            the 1-indexed position of responder ``j`` in proposer ``i``'s
+            preference list. Each row must be a permutation of ``1..n``.
+        responder_rank: ``(n, n)`` array with the symmetric convention.
+
+    Returns:
+        ``match`` of shape ``(n,)``, dtype ``int16``, where ``match[i]`` is
+        the responder paired with proposer ``i``.
+
+    Raises:
+        ValueError: if the two arrays don't have the same square shape, or
+            any row is not a permutation of ``1..n``.
+    """
+    _validate_rank_matrices(proposer_rank, responder_rank)
     n = proposer_rank.shape[0]
     next_proposal = np.zeros(n, dtype=np.int16)
     responder_match = np.full(n, -1, dtype=np.int16)

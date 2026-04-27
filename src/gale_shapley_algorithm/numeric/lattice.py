@@ -43,7 +43,7 @@ except ImportError as e:  # pragma: no cover
         "The `numeric` subpackage requires numpy. Install with `pip install gale-shapley-algorithm[numeric]`.",
     ) from e
 
-from gale_shapley_algorithm.numeric.gs import men_optimal_gs
+from gale_shapley_algorithm.numeric.gs import _validate_rank_matrices, men_optimal_gs
 from gale_shapley_algorithm.numeric.stability import is_stable_batch
 
 if TYPE_CHECKING:
@@ -152,7 +152,12 @@ def exposed_rotations(
 
     Returns:
         List of rotations; may be empty if no rotation is exposed.
+
+    Raises:
+        ValueError: if the rank matrices are not same-shape square permutation
+            matrices.
     """
+    _validate_rank_matrices(men_rank, women_rank)
     next_target, next_man = _compute_rotation_pointers(matching, men_rank, women_rank)
     cycles = _find_cycles(next_man)
     rotations: list[NDArray[np.int16]] = []
@@ -265,7 +270,13 @@ def enumerate_stable_matchings(
 
     Returns:
         ``(|L|, n)`` int16 array of men-indexed stable matchings.
+
+    Raises:
+        ValueError: if the rank matrices are not same-shape square permutation
+            matrices, or ``method`` is unknown, or brute-force is requested
+            with ``n > max_n``.
     """
+    _validate_rank_matrices(men_rank, women_rank)
     if method == "rotation":
         return _enumerate_via_rotations(men_rank, women_rank)
     if method == "brute":
