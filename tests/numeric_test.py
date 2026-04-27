@@ -137,6 +137,37 @@ def test_gs_rejects_mismatched_shapes() -> None:
         gale_shapley(np.zeros((3, 3), dtype=np.int16), np.zeros((4, 4), dtype=np.int16))
 
 
+def test_gs_rejects_non_permutation_rows() -> None:
+    """Silent acceptance of non-permutation rows produces wrong matchings — must raise."""
+    bad_proposer = np.array([[1, 1, 2], [1, 2, 3], [3, 2, 1]], dtype=np.int16)
+    good_responder = np.array([[1, 2, 3], [2, 3, 1], [3, 1, 2]], dtype=np.int16)
+    with pytest.raises(ValueError, match="permutation"):
+        gale_shapley(bad_proposer, good_responder)
+
+
+def test_gs_rejects_zero_indexed_input() -> None:
+    """1-indexed convention is documented; 0-indexed input must not be silently accepted."""
+    proposer_rank = np.array([[0, 1, 2], [2, 0, 1], [1, 2, 0]], dtype=np.int16)
+    responder_rank = np.array([[0, 1, 2], [1, 2, 0], [2, 0, 1]], dtype=np.int16)
+    with pytest.raises(ValueError, match="permutation"):
+        gale_shapley(proposer_rank, responder_rank)
+
+
+def test_enumerate_stable_matchings_rejects_non_permutation_rows() -> None:
+    bad = np.array([[1, 5, 9], [2, 3, 1], [3, 1, 2]], dtype=np.int16)
+    good = np.array([[1, 2, 3], [2, 3, 1], [3, 1, 2]], dtype=np.int16)
+    with pytest.raises(ValueError, match="permutation"):
+        enumerate_stable_matchings(bad, good)
+
+
+def test_exposed_rotations_rejects_non_permutation_rows() -> None:
+    bad = np.array([[1, 1, 2], [1, 2, 3], [3, 2, 1]], dtype=np.int16)
+    good = np.array([[1, 2, 3], [2, 3, 1], [3, 1, 2]], dtype=np.int16)
+    matching = np.array([0, 1, 2], dtype=np.int16)
+    with pytest.raises(ValueError, match="permutation"):
+        exposed_rotations(bad, good, matching)
+
+
 def test_is_stable_false_on_wrong_length_match() -> None:
     men_rank = np.array([[1, 2], [2, 1]], dtype=np.int16)
     women_rank = np.array([[1, 2], [2, 1]], dtype=np.int16)
