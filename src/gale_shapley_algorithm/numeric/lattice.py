@@ -36,6 +36,9 @@ import itertools
 from collections import deque
 from typing import TYPE_CHECKING, Literal
 
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
 try:
     import numpy as np
 except ImportError as e:  # pragma: no cover
@@ -61,30 +64,25 @@ _DEFAULT_BATCH_SIZE = 200_000
 
 def _next_rotation_target(
     m: int,
-    matching: NDArray[np.integer],
-    men_rank: NDArray[np.integer],
+    men_pref: NDArray[np.integer],
     women_rank: NDArray[np.integer],
     partner_of_woman: NDArray[np.integer],
+    current_partner_rank: int,
 ) -> int:
     """Return the next woman m would pair with if displaced from his current partner.
 
-    Specifically: walk m's preference list strictly below his current partner,
-    and return the first woman who prefers m to her current ``matching``-partner.
-    Returns -1 if no such woman exists.
+    Walk m's preference list strictly below his current partner and return the
+    first woman who prefers m to her current ``matching``-partner. Returns -1
+    if no such woman exists.
 
-    This is the classical rotation-target definition: the woman m would
-    "promote to" in one step of a breakmarriage cycle. It depends on the
-    current matching, not on any precomputed reduced list — a stale reduced
-    list was the trap in my first implementation attempt.
+    The walk is over a precomputed ``men_pref`` (rank -> woman) so the lookup
+    per rank is O(1). Operates against the current matching directly, not a
+    precomputed reduced preference list, since rotation targets shift as the
+    matching descends the lattice (Gusfield-Irving 1989, §3.2.1).
     """
-    n = int(matching.shape[0])
-    current_partner_rank = int(men_rank[m, int(matching[m])])
-    for target_rank in range(current_partner_rank + 1, n + 1):
-        # Find the woman at preference rank ``target_rank`` on m's list.
-        matches = np.where(men_rank[m] == target_rank)[0]
-        if matches.size == 0:
-            continue
-        w = int(matches[0])
+    n = int(men_pref.shape[1])
+    for k in range(current_partner_rank, n):
+        w = int(men_pref[m, k])
         if int(women_rank[w, m]) < int(women_rank[w, int(partner_of_woman[w])]):
             return w
     return -1
@@ -98,10 +96,14 @@ def _compute_rotation_pointers(
     """Build next_target and next_man dictionaries for every man with a valid rotation target."""
     n = int(matching.shape[0])
     partner_of_woman = np.argsort(matching).astype(np.int16)
+    # men_pref[m, k] = woman at rank (k+1) on m's list. argsort once per call
+    # rather than np.where(...) per rank inside the per-man loop.
+    men_pref = np.argsort(men_rank, axis=1).astype(np.int16)
+    current_partner_rank = men_rank[np.arange(n, dtype=np.int16), matching]
     next_target: dict[int, int] = {}
     next_man: dict[int, int] = {}
     for m in range(n):
-        w = _next_rotation_target(m, matching, men_rank, women_rank, partner_of_woman)
+        w = _next_rotation_target(m, men_pref, women_rank, partner_of_woman, int(current_partner_rank[m]))
         if w != -1:
             next_target[m] = w
             next_man[m] = int(partner_of_woman[w])
@@ -199,7 +201,6 @@ def _enumerate_via_rotations(
     women_rank: NDArray[np.integer],
 ) -> NDArray[np.int16]:
     """BFS the stable-matching lattice starting from the men-optimal matching."""
-    n = int(men_rank.shape[0])
     mo = men_optimal_gs(men_rank, women_rank).astype(np.int16)
     visited: dict[tuple[int, ...], NDArray[np.int16]] = {tuple(int(x) for x in mo): mo}
     queue: deque[NDArray[np.int16]] = deque([mo])
@@ -211,23 +212,13 @@ def _enumerate_via_rotations(
             if key not in visited:
                 visited[key] = new_matching
                 queue.append(new_matching)
-    if not visited:
-        return np.empty((0, n), dtype=np.int16)  # pragma: no cover
     return np.stack(list(visited.values()))
 
 
-def _permutation_batches(n: int, batch_size: int) -> tuple[NDArray[np.int16], ...]:
-    iterator = itertools.permutations(range(n))
-    batches: list[NDArray[np.int16]] = []
-    while True:
-        flat = np.fromiter(
-            itertools.islice(itertools.chain.from_iterable(iterator), batch_size * n),
-            dtype=np.int16,
-        )
-        if flat.size == 0:
-            break
-        batches.append(flat.reshape(-1, n))
-    return tuple(batches)
+def _permutation_batches(n: int, batch_size: int) -> Iterator[NDArray[np.int16]]:
+    perms = itertools.permutations(range(n))
+    while batch := list(itertools.islice(perms, batch_size)):
+        yield np.array(batch, dtype=np.int16)
 
 
 def _enumerate_via_brute_force(

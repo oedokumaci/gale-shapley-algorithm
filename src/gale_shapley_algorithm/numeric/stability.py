@@ -35,9 +35,7 @@ def find_blocking_pairs(
         List of 0-indexed ``(proposer, responder)`` blocking pairs.
     """
     n = proposer_rank.shape[0]
-    partner_of_responder = np.empty(n, dtype=np.int16)
-    for p in range(n):
-        partner_of_responder[int(match[p])] = p
+    partner_of_responder = np.argsort(match).astype(np.int16)
     blocking: list[tuple[int, int]] = []
     for p in range(n):
         current_r = int(match[p])
