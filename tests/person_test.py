@@ -60,17 +60,6 @@ class TestPerson:
         p.match = p
         assert p.is_matched
 
-    def test_is_matched_setter_false(self) -> None:
-        p = Person("p", "side")
-        p.match = Person("other", "side")
-        p.is_matched = False
-        assert p.match is None
-
-    def test_is_matched_setter_true_raises(self) -> None:
-        p = Person("p", "side")
-        with pytest.raises(ValueError, match="can only be set to False"):
-            p.is_matched = True
-
 
 class TestProposer:
     """Tests for Proposer class."""

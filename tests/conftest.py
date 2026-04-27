@@ -51,14 +51,6 @@ def deterministic_proposers_and_responders(
     return proposers, responders
 
 
-# Backward-compatible alias
-@pytest.fixture
-def create_deterministic_proposers_and_responders_fix(
-    deterministic_proposers_and_responders: tuple[list[Proposer], list[Responder]],
-) -> tuple[list[Proposer], list[Responder]]:
-    return deterministic_proposers_and_responders
-
-
 # --- Algorithm fixtures ---
 
 
