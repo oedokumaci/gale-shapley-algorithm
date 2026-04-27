@@ -71,22 +71,22 @@ class TestFormatMatches:
     """Tests for format_matches covering all match branches."""
 
     def test_proposer_unmatched(self) -> None:
-        m = Proposer("m", "man")
+        m = Proposer("m")
         m.match = None
         algo = Algorithm([m], [])
         result = algo.format_matches()
         assert "m is unmatched" in result
 
     def test_proposer_self_match(self) -> None:
-        m = Proposer("m", "man")
+        m = Proposer("m")
         m.match = m
         algo = Algorithm([m], [])
         result = algo.format_matches()
         assert "m is matched to self" in result
 
     def test_proposer_normal_match(self) -> None:
-        m = Proposer("m", "man")
-        w = Responder("w", "woman")
+        m = Proposer("m")
+        w = Responder("w")
         m.match = w
         w.match = m
         algo = Algorithm([m], [w])
@@ -94,14 +94,14 @@ class TestFormatMatches:
         assert "m is matched to w" in result
 
     def test_responder_self_match(self) -> None:
-        r = Responder("r", "woman")
+        r = Responder("r")
         r.match = r
         algo = Algorithm([], [r])
         result = algo.format_matches()
         assert "r is matched to self" in result
 
     def test_responder_unmatched(self) -> None:
-        r = Responder("r", "woman")
+        r = Responder("r")
         r.match = None
         algo = Algorithm([], [r])
         result = algo.format_matches()
@@ -169,8 +169,8 @@ class TestExecute:
 
     def test_execute_with_self_match(self) -> None:
         """When a proposer exhausts all acceptable, they self-match."""
-        m = Proposer("m", "man")
-        w = Responder("w", "woman")
+        m = Proposer("m")
+        w = Responder("w")
         # m only finds self acceptable (self before w)
         m.preferences = (m, w)
         w.preferences = (m, w)

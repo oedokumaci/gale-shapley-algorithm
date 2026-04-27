@@ -39,8 +39,8 @@ def _random_instance(n: int, rng: np.random.Generator) -> tuple[np.ndarray, np.n
 
 def _symbolic_men_optimal(men_rank: np.ndarray, women_rank: np.ndarray) -> np.ndarray:
     n = men_rank.shape[0]
-    men = [Proposer(f"m{i}", "man") for i in range(n)]
-    women = [Responder(f"w{j}", "woman") for j in range(n)]
+    men = [Proposer(f"m{i}") for i in range(n)]
+    women = [Responder(f"w{j}") for j in range(n)]
     for i, p in enumerate(men):
         order = np.argsort(men_rank[i])
         p.preferences = (*[women[int(j)] for j in order], p)

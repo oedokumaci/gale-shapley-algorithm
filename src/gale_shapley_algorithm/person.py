@@ -1,75 +1,103 @@
-"""Person module.
+"""Person types: a structural Person Protocol with concrete Proposer / Responder.
 
-Creates the units in the matching environment.
-Person class is also the base class for Proposer and Responder classes.
+``Person`` is a Protocol — a structural type describing the surface that
+matching code reads (``name``, ``preferences``, ``match``, plus the two
+helpers ``is_acceptable`` and ``format_preferences``). ``Proposer`` and
+``Responder`` are standalone dataclasses that satisfy this protocol; they
+do **not** inherit from ``Person``.
+
+This decouples the data model from a single inheritance hierarchy: any type
+with the right shape (e.g. a future synthetic role for testing, or an
+RL-agent-driven participant) is a Person.
 """
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
+from typing import Protocol, runtime_checkable
 
-class Person:
-    """Person class, base class for Proposer and Responder."""
 
-    def __init__(self, name: str, side: str) -> None:
-        self.name = name
-        self.side = side
-        self.preferences: tuple[Proposer | Responder, ...] = ()
-        self.match: Proposer | Responder | None = None
+@runtime_checkable
+class Person(Protocol):
+    """Structural type for a participant in a matching."""
 
-    def __repr__(self) -> str:
-        match self.match:
-            case None:
-                return f"Name: {self.name}, Side: {self.side}, Match: None"
-            case _:
-                return f"Name: {self.name}, Side: {self.side}, Match: {self.match.name}"
-
-    def is_acceptable(self, person: Proposer | Responder) -> bool:
-        """Check if person is acceptable (ranked at or above self in preferences).
-
-        Args:
-            person: The person to check acceptability for.
-
-        Raises:
-            ValueError: If person is not in preferences.
-
-        Returns:
-            True if person is acceptable, False otherwise.
-        """
-        if person in self.preferences and self in self.preferences:
-            return self.preferences.index(person) <= self.preferences.index(self)
-        raise ValueError(f"Either {self} or {person} is not in preferences.")
-
-    def format_preferences(self) -> str:
-        """Format the preferences of the person as a string, * indicates acceptable."""
-        lines = [f"{self.name} has the following preferences, * indicates acceptable:"]
-        offset_one: int = len(str(len(self.preferences)))
-        offset_two: int = max(len(person.name) for person in self.preferences)
-        for i, person in enumerate(self.preferences, start=1):
-            acceptable = "*" if self.is_acceptable(person) else ""
-            lines.append(f"{i}.{'':{offset_one - len(str(i)) + 1}}{person.name:<{offset_two + 1}}{acceptable}")
-        return "\n".join(lines)
+    name: str
+    preferences: tuple[Proposer | Responder, ...]
+    match: Proposer | Responder | None
 
     @property
     def is_matched(self) -> bool:
-        """Returns True if the person is matched to someone or self, False if match is None."""
-        return bool(self.match)
+        """True iff matched to someone or self."""
+        ...  # pragma: no cover
+
+    def is_acceptable(self, person: Proposer | Responder) -> bool:
+        """True iff person is at or before self in preferences."""
+        ...  # pragma: no cover
+
+    def format_preferences(self) -> str:
+        """Format the preferences as a string; ``*`` marks acceptable choices."""
+        ...  # pragma: no cover
 
 
-class Proposer(Person):
-    """Proposer class, subclass of Person."""
+def _is_acceptable(self: Person, person: Proposer | Responder) -> bool:
+    """True iff person is ranked at or before self in self's preferences.
 
-    def __init__(self, name: str, side: str) -> None:
-        super().__init__(name, side)
-        self.last_proposal: Responder | Proposer | None = None
+    self is always acceptable to itself (it always appears in its own
+    preference tuple as the cutoff).
+
+    Raises:
+        ValueError: if either operand is not in ``self.preferences``.
+    """
+    if person in self.preferences and self in self.preferences:
+        return self.preferences.index(person) <= self.preferences.index(self)
+    raise ValueError(f"Either {self!r} or {person!r} is not in preferences.")
+
+
+def _format_preferences(self: Person) -> str:
+    """Format the preferences as a string; ``*`` marks acceptable choices."""
+    lines = [f"{self.name} has the following preferences, * indicates acceptable:"]
+    offset_one: int = len(str(len(self.preferences)))
+    offset_two: int = max(len(p.name) for p in self.preferences)
+    for i, p in enumerate(self.preferences, start=1):
+        marker = "*" if _is_acceptable(self, p) else ""
+        lines.append(f"{i}.{'':{offset_one - len(str(i)) + 1}}{p.name:<{offset_two + 1}}{marker}")
+    return "\n".join(lines)
+
+
+@dataclass(slots=True, eq=False)
+class Proposer:
+    """Proposing-side participant in a matching."""
+
+    name: str
+    preferences: tuple[Proposer | Responder, ...] = ()
+    match: Proposer | Responder | None = None
+    last_proposal: Responder | Proposer | None = None
+
+    def __repr__(self) -> str:
+        match_repr = "None" if self.match is None else self.match.name
+        return f"Name: {self.name}, Match: {match_repr}"
+
+    @property
+    def is_matched(self) -> bool:
+        """True iff matched to someone or self."""
+        return self.match is not None
+
+    def is_acceptable(self, person: Proposer | Responder) -> bool:
+        """True iff person is at or before self in preferences."""
+        return _is_acceptable(self, person)
+
+    def format_preferences(self) -> str:
+        """Format the preferences as a string; ``*`` marks acceptable choices."""
+        return _format_preferences(self)
 
     @property
     def acceptable_to_propose(self) -> tuple[Responder | Proposer, ...]:
-        """Returns a tuple of acceptable responders to propose to."""
-        return tuple(filter(self.is_acceptable, self.preferences))
+        """Tuple of acceptable counterparties to propose to."""
+        return tuple(p for p in self.preferences if self.is_acceptable(p))
 
     @property
     def next_proposal(self) -> Responder | Proposer:
-        """Returns the next acceptable responder to propose to, or self if exhausted."""
+        """Next acceptable counterparty to propose to, or self if exhausted."""
         try:
             match self.last_proposal:
                 case None:
@@ -80,49 +108,69 @@ class Proposer(Person):
             return self
 
     def propose(self) -> None:
-        """Propose to the next acceptable responder. If self is next, set match to self."""
+        """Propose to the next acceptable responder, or self-match if exhausted."""
         match self.next_proposal:
-            case Proposer():  # meaning self is next
+            case Proposer():  # next_proposal returned self
                 self.match = self
             case responder:
                 responder.current_proposals.append(self)
         self.last_proposal = self.next_proposal
 
 
-class Responder(Person):
-    """Responder class, subclass of Person."""
+@dataclass(slots=True, eq=False)
+class Responder:
+    """Responding-side participant in a matching."""
 
-    def __init__(self, name: str, side: str) -> None:
-        super().__init__(name, side)
-        self.current_proposals: list[Proposer] = []
+    name: str
+    preferences: tuple[Proposer | Responder, ...] = ()
+    match: Proposer | Responder | None = None
+    current_proposals: list[Proposer] = field(default_factory=list)
+
+    def __repr__(self) -> str:
+        match_repr = "None" if self.match is None else self.match.name
+        return f"Name: {self.name}, Match: {match_repr}"
+
+    @property
+    def is_matched(self) -> bool:
+        """True iff matched to someone or self."""
+        return self.match is not None
+
+    def is_acceptable(self, person: Proposer | Responder) -> bool:
+        """True iff person is at or before self in preferences."""
+        return _is_acceptable(self, person)
+
+    def format_preferences(self) -> str:
+        """Format the preferences as a string; ``*`` marks acceptable choices."""
+        return _format_preferences(self)
 
     @property
     def awaiting_to_respond(self) -> bool:
-        """Returns True if current_proposals is not empty."""
+        """True iff there are pending proposals to respond to."""
         return bool(self.current_proposals)
 
     @property
     def acceptable_proposals(self) -> list[Proposer]:
-        """Returns a list of acceptable proposals among the current proposals."""
+        """Pending proposals filtered to acceptable ones."""
         return [p for p in self.current_proposals if self.is_acceptable(p)]
 
     def _most_preferred(self, proposals: list[Proposer]) -> Proposer:
-        """Returns most preferred of the list.
+        """Return the most-preferred member of ``proposals``.
 
         Raises:
-            ValueError: If preferences or proposals is empty, or proposal not in preferences.
+            ValueError: if preferences or proposals is empty, or any proposal
+                is not in preferences.
         """
-        if bool(self.preferences) and bool(proposals) and all(proposal in self.preferences for proposal in proposals):
+        if self.preferences and proposals and all(p in self.preferences for p in proposals):
             return min(proposals, key=self.preferences.index)
         raise ValueError("Either preferences or proposals is empty, or one of the proposals is not in preferences.")
 
     def respond(self) -> None:
-        """Respond to proposals and clear the current_proposals."""
-        if bool(self.acceptable_proposals):
+        """Respond to current proposals, then clear the queue."""
+        if self.acceptable_proposals:
             match self.match:
                 case Proposer() as current_match:
                     new_match = self._most_preferred(self.acceptable_proposals + [current_match])
-                    if new_match != current_match:
+                    if new_match is not current_match:
                         current_match.match = None
                         self.match = new_match
                         new_match.match = self

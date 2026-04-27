@@ -20,10 +20,10 @@ class TestFindBlockingPairs:
 
     def test_blocking_pair_responder_unmatched(self) -> None:
         """A blocking pair exists when proposer prefers an unmatched responder."""
-        m1 = Proposer("m1", "man")
-        m2 = Proposer("m2", "man")
-        w1 = Responder("w1", "woman")
-        w2 = Responder("w2", "woman")
+        m1 = Proposer("m1")
+        m2 = Proposer("m2")
+        w1 = Responder("w1")
+        w2 = Responder("w2")
 
         m1.preferences = (w1, w2, m1)
         m2.preferences = (w2, m2, w1)
@@ -40,10 +40,10 @@ class TestFindBlockingPairs:
 
     def test_blocking_pair_responder_prefers_proposer(self) -> None:
         """A blocking pair when responder prefers a different proposer."""
-        m1 = Proposer("m1", "man")
-        m2 = Proposer("m2", "man")
-        w1 = Responder("w1", "woman")
-        w2 = Responder("w2", "woman")
+        m1 = Proposer("m1")
+        m2 = Proposer("m2")
+        w1 = Responder("w1")
+        w2 = Responder("w2")
 
         m1.preferences = (w1, w2, m1)
         m2.preferences = (w1, w2, m2)
@@ -59,8 +59,8 @@ class TestFindBlockingPairs:
 
     def test_blocking_pairs_skip_self(self) -> None:
         """Self (Proposer) in better_than_match is skipped."""
-        m = Proposer("m", "man")
-        w = Responder("w", "woman")
+        m = Proposer("m")
+        w = Responder("w")
 
         m.preferences = (m, w)
         w.preferences = (m, w)
@@ -70,16 +70,16 @@ class TestFindBlockingPairs:
         assert find_blocking_pairs([m], [w]) == []
 
     def test_blocking_pairs_proposer_no_preferences(self) -> None:
-        m = Proposer("m", "man")
-        w = Responder("w", "woman")
+        m = Proposer("m")
+        w = Responder("w")
         m.preferences = ()
         m.match = m
 
         assert find_blocking_pairs([m], [w]) == []
 
     def test_blocking_pairs_proposer_not_matched(self) -> None:
-        m = Proposer("m", "man")
-        w = Responder("w", "woman")
+        m = Proposer("m")
+        w = Responder("w")
         m.preferences = (w, m)
         m.match = None
 
@@ -96,10 +96,10 @@ class TestCheckStability:
         assert result.blocking_pairs == []
 
     def test_unstable_matching(self) -> None:
-        m1 = Proposer("m1", "man")
-        m2 = Proposer("m2", "man")
-        w1 = Responder("w1", "woman")
-        w2 = Responder("w2", "woman")
+        m1 = Proposer("m1")
+        m2 = Proposer("m2")
+        w1 = Responder("w1")
+        w2 = Responder("w2")
 
         m1.preferences = (w1, w2, m1)
         m2.preferences = (w1, w2, m2)

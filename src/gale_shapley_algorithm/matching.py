@@ -23,8 +23,8 @@ def _build_algorithm(
     Returns:
         A fully-wired Algorithm ready for execution.
     """
-    proposers = {name: Proposer(name, "proposer") for name in proposer_preferences}
-    responders = {name: Responder(name, "responder") for name in responder_preferences}
+    proposers = {name: Proposer(name) for name in proposer_preferences}
+    responders = {name: Responder(name) for name in responder_preferences}
 
     for name, pref_names in proposer_preferences.items():
         p = proposers[name]

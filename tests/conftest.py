@@ -10,22 +10,22 @@ from gale_shapley_algorithm.person import Proposer, Responder
 
 @pytest.fixture
 def m_1_fix() -> Proposer:
-    return Proposer("m_1", "man")
+    return Proposer("m_1")
 
 
 @pytest.fixture
 def m_2_fix() -> Proposer:
-    return Proposer("m_2", "man")
+    return Proposer("m_2")
 
 
 @pytest.fixture
 def w_1_fix() -> Responder:
-    return Responder("w_1", "woman")
+    return Responder("w_1")
 
 
 @pytest.fixture
 def w_2_fix() -> Responder:
-    return Responder("w_2", "woman")
+    return Responder("w_2")
 
 
 @pytest.fixture
