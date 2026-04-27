@@ -116,7 +116,7 @@ docs = { cmd = "uv run zensical serve", help = "Serve documentation locally" }
 docs_build = { cmd = "uv run zensical build --clean --strict", help = "Build documentation (strict)" }
 
 # Release
-changelog = { cmd = "uvx --with 'packaging<26' git-changelog --bump auto --config-file=config/git-changelog.toml && echo '\nRemember to update __version__ in src/gale_shapley/__init__.py'", help = "Update changelog" }
+changelog = { cmd = "uvx --with 'packaging<26' git-changelog --bump auto --config-file=config/git-changelog.toml && echo '\nRemember to update __version__ in src/{module}/__init__.py'", help = "Update changelog" }
 release = { cmd = "bash -c 'VERSION=$1; if [ -z \"$VERSION\" ]; then echo \"Usage: task release -- X.Y.Z\" && exit 1; fi; if [ -n \"$(git status --porcelain)\" ]; then echo \"Error: Working directory not clean\" && exit 1; fi; git tag v$VERSION && git push origin v$VERSION && gh release create v$VERSION --generate-notes' _", help = "Create a release (usage: task release -- X.Y.Z)" }
 
 # Utilities
