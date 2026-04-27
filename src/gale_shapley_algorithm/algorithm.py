@@ -54,14 +54,14 @@ class Algorithm:
             match proposer.match:
                 case None:
                     lines.append(f"{proposer.name} is unmatched.")
-                case m if m.name == proposer.name:
+                case m if m is proposer:
                     lines.append(f"{proposer.name} is matched to self.")
                 case m:
                     lines.append(f"{proposer.name} is matched to {m.name}.")
 
         for responder in self.responders:
             match responder.match:
-                case m if m == responder:
+                case m if m is responder:
                     lines.append(f"{responder.name} is matched to self.")
                 case None:
                     lines.append(f"{responder.name} is unmatched.")
@@ -133,14 +133,14 @@ class Algorithm:
             match proposer.match:
                 case None:
                     unmatched.append(proposer.name)
-                case m if m.name == proposer.name:
+                case m if m is proposer:
                     self_matches.append(proposer.name)
                 case m:
                     matches[proposer.name] = m.name
 
         for responder in self.responders:
             match responder.match:
-                case m if m == responder:
+                case m if m is responder:
                     self_matches.append(responder.name)
                 case None:
                     unmatched.append(responder.name)
