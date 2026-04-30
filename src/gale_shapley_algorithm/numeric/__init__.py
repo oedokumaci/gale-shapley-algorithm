@@ -30,7 +30,19 @@ Example:
     >>> lattice = enumerate_stable_matchings(proposer_rank, responder_rank)
 """
 
-from gale_shapley_algorithm.numeric.gs import gale_shapley, men_optimal_gs, women_optimal_gs
+from gale_shapley_algorithm.numeric.gs import (
+    GSStats,
+    Selector,
+    fifo_selector,
+    gale_shapley,
+    gale_shapley_traced,
+    lifo_selector,
+    men_optimal_gs,
+    men_optimal_traced,
+    random_selector,
+    women_optimal_gs,
+    women_optimal_traced,
+)
 from gale_shapley_algorithm.numeric.lattice import (
     apply_rotation,
     enumerate_stable_matchings,
@@ -39,12 +51,20 @@ from gale_shapley_algorithm.numeric.lattice import (
 from gale_shapley_algorithm.numeric.stability import find_blocking_pairs, is_stable
 
 __all__ = [
+    "GSStats",
+    "Selector",
     "apply_rotation",
     "enumerate_stable_matchings",
     "exposed_rotations",
+    "fifo_selector",
     "find_blocking_pairs",
     "gale_shapley",
+    "gale_shapley_traced",
     "is_stable",
+    "lifo_selector",
     "men_optimal_gs",
+    "men_optimal_traced",
+    "random_selector",
     "women_optimal_gs",
+    "women_optimal_traced",
 ]
