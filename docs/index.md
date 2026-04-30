@@ -83,7 +83,9 @@ For high-throughput work (many random instances, enumerating the stable-matching
 ```python
 import numpy as np
 from gale_shapley_algorithm.numeric import (
-    gale_shapley, men_optimal_gs, women_optimal_gs,
+    gale_shapley, gale_shapley_traced, men_optimal_gs, women_optimal_gs,
+    men_optimal_traced, women_optimal_traced,
+    lifo_selector, fifo_selector, random_selector,
     is_stable, find_blocking_pairs, enumerate_stable_matchings,
     exposed_rotations, apply_rotation,
 )
@@ -98,6 +100,16 @@ lattice = enumerate_stable_matchings(men_rank, women_rank)  # (|L|, n) int16
 # Step through the lattice manually via rotations:
 for rotation in exposed_rotations(men_rank, women_rank, mo):
     next_matching = apply_rotation(mo, rotation)
+
+# Traced variant: returns the matching plus per-proposer proposal counts,
+# with a pluggable proposer-selection rule (LIFO, FIFO, random, or custom).
+# The match and total proposal count are invariant under selector choice
+# (Knuth) — use the hook to drive the loop from a custom policy.
+stats = gale_shapley_traced(men_rank, women_rank)
+print(stats.proposals, stats.proposals_per_proposer)
+
+rng = np.random.default_rng(0)
+_ = gale_shapley_traced(men_rank, women_rank, selector=random_selector(rng))
 ```
 
 See `examples/numeric_usage.py` for a more complete walk-through. `enumerate_stable_matchings`
