@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v1.8.0](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.8.0) - 2026-04-30
+
+<small>[Compare with v1.7.0](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.7.0...v1.8.0)</small>
+
+### Features
+
+- **`gale_shapley_traced` with proposal stats and a pluggable proposer-selection rule** in `gale_shapley_algorithm.numeric.gs`. Runs the same sequential M-W loop as `gale_shapley` but returns a `GSStats` (frozen dataclass with `match`, total `proposals`, and per-proposer `proposals_per_proposer`). Accepts a `Selector` callback that picks the next free proposer; included presets are `lifo_selector` (default, matches the historical `free.pop()` behavior), `fifo_selector`, and a `random_selector(rng)` factory backed by an `np.random.Generator`. The proposer-optimal matching and total proposal count are both invariant under selector choice (Knuth) for one-sided M-W; the hook is intended for callers driving the loop from a custom policy (RL agents, custom heuristics, randomized analyses).
+- **Convenience wrappers** `men_optimal_traced` and `women_optimal_traced` mirror the orientation conventions of `men_optimal_gs` / `women_optimal_gs` (women-optimal returns men-indexed `match`, women-indexed `proposals_per_proposer`; documented on the function).
+- `gale_shapley` is refactored to a thin wrapper over `gale_shapley_traced` (returns `.match`); behavior is identical.
+
+### Tests / CI
+
+- 13 new tests (140 total); 100% coverage on `numeric/gs.py` retained, total project coverage 98.47%. New parametrized test verifies the canonical `n*(n+1)/2` worst-case proposal count for shared preferences (n in 2..8) — the pathological clustering case where every proposer has the same ranking.
+
+### Docs
+
+- `docs/index.md` and the `numeric` subpackage docstring document the traced API with a short example.
+
 ## [v1.7.0](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.7.0) - 2026-04-18
 
 <small>[Compare with v1.6.0](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.6.0...v1.7.0)</small>
