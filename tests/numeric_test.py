@@ -15,14 +15,21 @@ import pytest
 
 from gale_shapley_algorithm import Algorithm, Proposer, Responder
 from gale_shapley_algorithm.numeric import (
+    GSStats,
     apply_rotation,
     enumerate_stable_matchings,
     exposed_rotations,
+    fifo_selector,
     find_blocking_pairs,
     gale_shapley,
+    gale_shapley_traced,
     is_stable,
+    lifo_selector,
     men_optimal_gs,
+    men_optimal_traced,
+    random_selector,
     women_optimal_gs,
+    women_optimal_traced,
 )
 from gale_shapley_algorithm.numeric.stability import is_stable_batch
 
@@ -263,3 +270,141 @@ def test_apply_rotation_does_not_mutate_input(rng: np.random.Generator) -> None:
         _ = apply_rotation(mo, rotations[0])
         assert np.array_equal(mo, mo_copy)
         assert np.array_equal(rotations[0], rotation_copy)
+
+
+# --- traced GS API -----------------------------------------------------------
+
+
+def _same_prefs_instance(n: int) -> tuple[np.ndarray, np.ndarray]:
+    """All proposers share one ranking of responders, and vice versa: the
+    pathological clustering case where men-MW makes ``n*(n+1)/2`` proposals."""
+    rank = np.tile(np.arange(1, n + 1, dtype=np.int16), (n, 1))
+    return rank, rank.copy()
+
+
+def test_traced_match_equals_gale_shapley(rng: np.random.Generator) -> None:
+    """gale_shapley_traced.match must agree with the historical gale_shapley."""
+    for _ in range(20):
+        men, women = _random_instance(6, rng)
+        stats = gale_shapley_traced(men, women)
+        assert np.array_equal(stats.match, gale_shapley(men, women))
+
+
+def test_traced_returns_gsstats(rng: np.random.Generator) -> None:
+    men, women = _random_instance(5, rng)
+    stats = gale_shapley_traced(men, women)
+    assert isinstance(stats, GSStats)
+
+
+def test_traced_proposals_equals_per_proposer_sum(rng: np.random.Generator) -> None:
+    for _ in range(20):
+        men, women = _random_instance(7, rng)
+        stats = gale_shapley_traced(men, women)
+        assert stats.proposals == int(stats.proposals_per_proposer.sum())
+
+
+def test_traced_proposals_per_proposer_is_match_rank(rng: np.random.Generator) -> None:
+    """Each proposer's count equals the 1-indexed rank of their final match."""
+    for _ in range(20):
+        men, women = _random_instance(6, rng)
+        stats = gale_shapley_traced(men, women)
+        for p in range(stats.match.shape[0]):
+            r = int(stats.match[p])
+            assert int(stats.proposals_per_proposer[p]) == int(men[p, r])
+
+
+def test_traced_match_invariant_under_selector(rng: np.random.Generator) -> None:
+    """Knuth: proposer-optimal matching is invariant to proposer order."""
+    selector_rng = np.random.default_rng(123)
+    for _ in range(15):
+        men, women = _random_instance(7, rng)
+        lifo = gale_shapley_traced(men, women, selector=lifo_selector).match
+        fifo = gale_shapley_traced(men, women, selector=fifo_selector).match
+        rand = gale_shapley_traced(men, women, selector=random_selector(selector_rng)).match
+        assert np.array_equal(lifo, fifo)
+        assert np.array_equal(lifo, rand)
+
+
+def test_traced_proposal_count_invariant_under_selector(rng: np.random.Generator) -> None:
+    """One-sided M-W: total proposals depend only on the final match (which is
+    Knuth-invariant), so the count is also invariant under selector choice."""
+    selector_rng = np.random.default_rng(7)
+    for _ in range(15):
+        men, women = _random_instance(7, rng)
+        lifo = gale_shapley_traced(men, women, selector=lifo_selector).proposals
+        fifo = gale_shapley_traced(men, women, selector=fifo_selector).proposals
+        rand = gale_shapley_traced(men, women, selector=random_selector(selector_rng)).proposals
+        assert lifo == fifo == rand
+
+
+@pytest.mark.parametrize("n", [2, 3, 4, 5, 6, 8])
+def test_traced_same_prefs_is_quadratic(n: int) -> None:
+    """When every proposer shares one ranking and every responder shares one
+    ranking, men-MW makes exactly ``1+2+...+n = n*(n+1)/2`` proposals — the
+    canonical worst case that motivates this work."""
+    p_rank, r_rank = _same_prefs_instance(n)
+    stats = gale_shapley_traced(p_rank, r_rank)
+    assert stats.proposals == n * (n + 1) // 2
+    assert np.array_equal(stats.match, np.arange(n, dtype=np.int16))
+
+
+def test_random_selector_terminates_and_is_stable(rng: np.random.Generator) -> None:
+    selector_rng = np.random.default_rng(42)
+    selector = random_selector(selector_rng)
+    for _ in range(10):
+        men, women = _random_instance(8, rng)
+        stats = gale_shapley_traced(men, women, selector=selector)
+        assert is_stable(men, women, stats.match)
+
+
+def test_men_optimal_traced_delegates(rng: np.random.Generator) -> None:
+    men, women = _random_instance(6, rng)
+    via_wrapper = men_optimal_traced(men, women)
+    via_primitive = gale_shapley_traced(men, women)
+    assert np.array_equal(via_wrapper.match, via_primitive.match)
+    assert via_wrapper.proposals == via_primitive.proposals
+
+
+def test_women_optimal_traced_match_matches_women_optimal_gs(rng: np.random.Generator) -> None:
+    """women_optimal_traced.match must equal women_optimal_gs (men-indexed)."""
+    for _ in range(10):
+        men, women = _random_instance(6, rng)
+        traced = women_optimal_traced(men, women)
+        legacy = women_optimal_gs(men, women)
+        assert np.array_equal(traced.match, legacy)
+        assert is_stable(men, women, traced.match)
+
+
+def test_women_optimal_traced_per_proposer_indexed_by_woman(rng: np.random.Generator) -> None:
+    """proposals_per_proposer in women_optimal_traced is indexed by woman, so
+    woman w's count equals the rank of her partner in her own preference list."""
+    men, women = _random_instance(6, rng)
+    traced = women_optimal_traced(men, women)
+    n = traced.match.shape[0]
+    for w in range(n):
+        partner_m = int(np.argwhere(traced.match == w)[0, 0])
+        assert int(traced.proposals_per_proposer[w]) == int(women[w, partner_m])
+
+
+def test_women_optimal_traced_proposals_total(rng: np.random.Generator) -> None:
+    men, women = _random_instance(6, rng)
+    traced = women_optimal_traced(men, women)
+    assert traced.proposals == int(traced.proposals_per_proposer.sum())
+
+
+def test_traced_validates_inputs() -> None:
+    """Validation should run before the loop, same as gale_shapley."""
+    bad = np.array([[1, 1, 2], [1, 2, 3], [3, 2, 1]], dtype=np.int16)
+    good = np.array([[1, 2, 3], [2, 3, 1], [3, 1, 2]], dtype=np.int16)
+    with pytest.raises(ValueError, match="permutation"):
+        gale_shapley_traced(bad, good)
+
+
+def test_lifo_and_fifo_selectors_are_pure() -> None:
+    """The default selectors don't read or mutate the free list contents."""
+    assert lifo_selector([0, 1, 2]) == -1
+    assert fifo_selector([0, 1, 2]) == 0
+    free = [4, 5, 6]
+    _ = lifo_selector(free)
+    _ = fifo_selector(free)
+    assert free == [4, 5, 6]
