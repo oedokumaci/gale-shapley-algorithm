@@ -38,5 +38,8 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.59.4",
     "vite": "^8.0.13"
+  },
+  "overrides": {
+    "ip-address": "^10.1.1"
   }
 }
