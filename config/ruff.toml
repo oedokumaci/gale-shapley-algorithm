@@ -24,6 +24,7 @@ ignore = [
     "G004",   # Logging f-string
 
     # --- Opinionated ignores ---
+    "CPY",    # Copyright notice at top of files (no copyright-header convention)
     "ANN",    # Type annotations (already typed, too strict for all cases)
     "T20",    # print() statements (acceptable in CLI app)
     "S101",   # assert in code (used in tests)
