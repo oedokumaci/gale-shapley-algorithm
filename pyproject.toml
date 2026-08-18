@@ -85,6 +85,7 @@ src = "src"
 tests = "tests"
 all = "src tests"
 module = "gale_shapley_algorithm"
+ruff = "0.16.3"
 
 [tool.taskipy.tasks]
 # Module runner
@@ -97,8 +98,10 @@ gui = { cmd = "uv run uvicorn gale_shapley_algorithm._api.app:app --reload --por
 setup = { cmd = "uv sync --extra cli --extra gui", help = "Install dependencies" }
 
 # Always write changes
-format = { cmd = "uvx ruff format --config=config/ruff.toml {all}", help = "Format code (writes changes)" }
-lint = { cmd = "uvx ruff check --config=config/ruff.toml --fix {all}", help = "Lint and auto-fix (writes changes)" }
+# ruff is pinned ({ruff}) so unpinned releases can't change lint/format behavior
+# under select = ["ALL"]; bump the pin deliberately and re-run `task ci`.
+format = { cmd = "uvx ruff@{ruff} format --config=config/ruff.toml {all}", help = "Format code (writes changes)" }
+lint = { cmd = "uvx ruff@{ruff} check --config=config/ruff.toml --fix {all}", help = "Lint and auto-fix (writes changes)" }
 
 # Convenience: run both
 fix = { cmd = "task format && task lint", help = "Format + lint auto-fix" }
@@ -107,8 +110,8 @@ fix = { cmd = "task format && task lint", help = "Format + lint auto-fix" }
 typecheck = { cmd = "uvx ty check --config-file=config/ty.toml --venv .venv {src}", help = "Run type checking" }
 
 # Quality checks (read-only, for CI)
-format_check = { cmd = "uvx ruff format --config=config/ruff.toml --check {all}", help = "Check code formatting (CI)" }
-lint_check = { cmd = "uvx ruff check --config=config/ruff.toml {all}", help = "Check linting (CI)" }
+format_check = { cmd = "uvx ruff@{ruff} format --config=config/ruff.toml --check {all}", help = "Check code formatting (CI)" }
+lint_check = { cmd = "uvx ruff@{ruff} check --config=config/ruff.toml {all}", help = "Check linting (CI)" }
 test = { cmd = "uv run pytest -c config/pytest.ini {tests} --cov={src} --cov-report=html --cov-report=term", help = "Run tests with coverage" }
 test_no_cov = { cmd = "uv run pytest -c config/pytest.ini {tests}", help = "Run test suite" }
 
