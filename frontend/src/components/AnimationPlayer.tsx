@@ -44,6 +44,9 @@ export function AnimationPlayer({
 
   const totalPhases = data.steps.length * 3;
   const isAtEnd = currentPhase > totalPhases;
+  // Derived instead of synced: past the end the interval just stops running,
+  // so no effect has to set `playing` back to false.
+  const running = playing && !isAtEnd;
 
   const roundIndex = currentPhase > 0 ? Math.floor((currentPhase - 1) / 3) : -1;
   const phaseInRound = currentPhase > 0 ? (currentPhase - 1) % 3 : -1;
@@ -60,14 +63,8 @@ export function AnimationPlayer({
   }, []);
 
   const advance = useCallback(() => {
-    setCurrentPhase((prev) => {
-      if (prev > totalPhases) {
-        stop();
-        return prev;
-      }
-      return prev + 1;
-    });
-  }, [totalPhases, stop]);
+    setCurrentPhase((prev) => Math.min(prev + 1, totalPhases + 1));
+  }, [totalPhases]);
 
   const stepBack = useCallback(() => {
     stop();
@@ -92,19 +89,13 @@ export function AnimationPlayer({
   }, [isAtEnd, currentPhase]);
 
   useEffect(() => {
-    if (playing) {
+    if (running) {
       intervalRef.current = setInterval(advance, speed);
       return () => {
         if (intervalRef.current) clearInterval(intervalRef.current);
       };
     }
-  }, [playing, speed, advance]);
-
-  useEffect(() => {
-    if (currentPhase > totalPhases && playing) {
-      stop();
-    }
-  }, [currentPhase, totalPhases, playing, stop]);
+  }, [running, speed, advance]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -187,8 +178,8 @@ export function AnimationPlayer({
             <Button size="icon" variant="outline" onClick={stepBack} disabled={currentPhase === 0} aria-label="Step back (h)" className="h-8 w-8">
               <SkipBack className="h-3.5 w-3.5" />
             </Button>
-            <Button size="icon" onClick={togglePlay} aria-label={playing ? 'Pause (space)' : 'Play (space)'} className="h-10 w-10 rounded-full">
-              {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 ml-0.5" />}
+            <Button size="icon" onClick={togglePlay} aria-label={running ? 'Pause (space)' : 'Play (space)'} className="h-10 w-10 rounded-full">
+              {running ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 ml-0.5" />}
             </Button>
             <Button size="icon" variant="outline" onClick={stepForward} disabled={isAtEnd} aria-label="Step forward (l)" className="h-8 w-8">
               <SkipForward className="h-3.5 w-3.5" />
