@@ -167,6 +167,24 @@ class TestExecute:
         assert "w_2" in result.self_matches
         assert not result.all_matched
 
+    def test_execute_after_reassigning_preferences_between_rounds(self) -> None:
+        """Preferences reassigned mid-run take effect from the next round on."""
+        m1 = Proposer("m1", "man")
+        m2 = Proposer("m2", "man")
+        w1 = Responder("w1", "woman")
+        w2 = Responder("w2", "woman")
+        m1.preferences = (w1, w2, m1)
+        m2.preferences = (w1, w2, m2)
+        w1.preferences = (m1, m2, w1)
+        w2.preferences = (m1, m2, w2)
+        algo = Algorithm([m1, m2], [w1, w2])
+        algo.proposers_propose()
+        algo.responders_respond()  # w1 keeps m1 and rejects m2
+        m2.preferences = (w1, m2, w2)  # w2 is no longer acceptable to m2
+        result = algo.execute()
+        assert result.matches == {"m1": "w1"}
+        assert result.self_matches == ["m2", "w2"]
+
     def test_execute_with_self_match(self) -> None:
         """When a proposer exhausts all acceptable, they self-match."""
         m = Proposer("m", "man")
