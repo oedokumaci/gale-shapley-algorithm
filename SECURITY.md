@@ -22,5 +22,5 @@ Security fixes are backported to the most recent minor release only.
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 1.7.x   | Yes                |
-| &lt; 1.7   | No                 |
+| 1.8.x   | Yes                |
+| &lt; 1.8   | No                 |
