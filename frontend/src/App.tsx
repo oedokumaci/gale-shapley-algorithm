@@ -22,14 +22,22 @@ type ViewMode = 'edit' | 'results' | 'animation';
 function useTheme() {
   const [dark, setDark] = useState(() => {
     if (typeof window === 'undefined') return false;
-    const stored = localStorage.getItem('theme');
-    if (stored) return stored === 'dark';
+    try {
+      const stored = localStorage.getItem('theme');
+      if (stored) return stored === 'dark';
+    } catch {
+      // Storage can be blocked (privacy settings, sandboxed iframes); use the system preference
+    }
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark);
-    localStorage.setItem('theme', dark ? 'dark' : 'light');
+    try {
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+    } catch {
+      // Blocked storage only means the choice isn't remembered
+    }
   }, [dark]);
 
   return { dark, toggle: () => setDark((d) => !d) };
