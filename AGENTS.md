@@ -13,7 +13,7 @@ all read it natively. There is deliberately no CLAUDE.md: Claude Code only reads
 | Import | `gale_shapley_algorithm` |
 | Python | >=3.12 |
 | Runtime deps | None (zero-dep core) |
-| Extras | `cli`, `gui` (user-facing) |
+| Extras | `cli`, `gui`, `numeric` (user-facing) |
 
 ## Quick Reference
 
