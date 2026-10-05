@@ -7,8 +7,8 @@ from typing import Self
 from pydantic import BaseModel, model_validator
 
 MAX_PEOPLE_PER_SIDE = 100
-"""Largest side the API accepts. The Person-based algorithm scales roughly as n**4, so much larger
-requests would tie up a worker for seconds (n=200 already takes about 5 s)."""
+"""Largest side the API accepts. It bounds the work and the response size of every request (the
+step-through response grows with the number of rounds); the GUI is meant for hand-sized instances."""
 
 
 class MatchingRequest(BaseModel):
