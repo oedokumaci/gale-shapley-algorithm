@@ -4,7 +4,8 @@ import { Slider } from '@/components/ui/slider';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SVGMatchingVisualization } from './SVGMatchingVisualization';
 import { ResultsPanel } from './ResultsPanel';
-import type { StepsResponse, AnimationPhase, PersonImages, RoundStep } from '@/types';
+import { buildFinalStep } from '@/lib/steps';
+import type { StepsResponse, AnimationPhase, PersonImages } from '@/types';
 import { Play, Pause, SkipBack, SkipForward, RotateCcw } from 'lucide-react';
 
 interface AnimationPlayerProps {
@@ -15,21 +16,6 @@ interface AnimationPlayerProps {
 }
 
 const PHASES: AnimationPhase[] = ['proposals', 'responses', 'matches'];
-
-function buildFinalStep(data: StepsResponse): RoundStep {
-  const result = data.final_result;
-  const matches = Object.entries(result.matches).map(([proposer, responder]) => ({
-    proposer,
-    responder,
-  }));
-  return {
-    round: result.rounds,
-    proposals: [],
-    rejections: [],
-    tentative_matches: matches,
-    self_matches: result.self_matches,
-  };
-}
 
 export function AnimationPlayer({
   data,
@@ -50,7 +36,13 @@ export function AnimationPlayer({
 
   const roundIndex = currentPhase > 0 ? Math.floor((currentPhase - 1) / 3) : -1;
   const phaseInRound = currentPhase > 0 ? (currentPhase - 1) % 3 : -1;
-  const currentStep = roundIndex >= 0 && roundIndex < data.steps.length ? data.steps[roundIndex] : null;
+  // The API lists a self-match only in the round it happens; carry it into the rounds after
+  const currentStep = roundIndex >= 0 && roundIndex < data.steps.length
+    ? {
+        ...data.steps[roundIndex],
+        self_matches: data.steps.slice(0, roundIndex + 1).flatMap((s) => s.self_matches),
+      }
+    : null;
   const animationPhase: AnimationPhase = phaseInRound >= 0 ? PHASES[phaseInRound] : 'proposals';
   const previousStep = roundIndex > 0 ? data.steps[roundIndex - 1] : null;
 
@@ -248,7 +240,7 @@ export function AnimationPlayer({
       {isAtEnd && (
         <>
           <SVGMatchingVisualization
-            step={buildFinalStep(data)}
+            step={buildFinalStep(data.final_result)}
             phase="matches"
             proposerNames={proposerNames}
             responderNames={responderNames}

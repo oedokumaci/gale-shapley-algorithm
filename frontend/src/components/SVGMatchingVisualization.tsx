@@ -7,7 +7,7 @@ import type { RoundStep, AnimationPhase, PersonImages } from '@/types';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface SVGMatchingVisualizationProps {
-  step: RoundStep | null; // null = initial "ready" frame
+  step: RoundStep | null; // null = initial "ready" frame; self_matches = everyone self-matched so far
   phase: AnimationPhase | null; // null = ready
   proposerNames: string[];
   responderNames: string[];
@@ -174,11 +174,17 @@ export function SVGMatchingVisualization({
   const matchMap = step ? new Map(step.tentative_matches.map((m) => [m.proposer, m.responder])) : new Map();
   const reverseMatchMap = step ? new Map(step.tentative_matches.map((m) => [m.responder, m.proposer])) : new Map();
   const rejectedSet = step ? new Set(step.rejections.map((r) => r.proposer)) : new Set<string>();
-  const selfMatchSet = step ? new Set(step.self_matches) : new Set<string>();
+  // Proposers without a partner only: the final result's self_matches also names responders left
+  // on their own, and a responder may share a proposer's name
+  const selfMatchSet = new Set(
+    step?.self_matches.filter((name) => proposerNames.includes(name) && !matchMap.has(name)),
+  );
 
   function getProposerStatus(name: string): 'default' | 'matched' | 'rejected' | 'self-matched' | 'unmatched' {
-    if (isReady || phase === 'proposals') return 'default';
+    if (isReady) return 'default';
+    // A self-match is final, so it stays marked through later rounds' proposals phase as well
     if (selfMatchSet.has(name)) return 'self-matched';
+    if (phase === 'proposals') return 'default';
     if (matchMap.has(name)) return phase === 'responses' ? 'default' : 'matched';
     if (rejectedSet.has(name)) return phase === 'responses' ? 'rejected' : 'unmatched';
     return 'default';
@@ -254,7 +260,7 @@ export function SVGMatchingVisualization({
   // Compute stats
   const matchedProposers = step ? step.tentative_matches.length : 0;
   const matchedResponders = step ? new Set(step.tentative_matches.map((m) => m.responder)).size : 0;
-  const unmatchedProposers = proposerNames.length - matchedProposers - (step?.self_matches.length ?? 0);
+  const unmatchedProposers = proposerNames.length - matchedProposers - selfMatchSet.size;
   const unmatchedResponders = responderNames.length - matchedResponders;
 
   // Build positioned narratives
