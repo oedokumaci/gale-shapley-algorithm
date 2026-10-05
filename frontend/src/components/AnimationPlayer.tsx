@@ -17,8 +17,16 @@ interface AnimationPlayerProps {
 
 const PHASES: AnimationPhase[] = ['proposals', 'responses', 'matches'];
 
-// Focused controls keep their keys (Space on a button, arrows on the speed slider, typing in a field)
-const INTERACTIVE_ELEMENTS = 'button, a, input, textarea, select, [role="slider"]';
+// A focused control keeps only the keys it uses itself: everything typed into a field, the arrows
+// on the speed slider, Space/Enter on a button or link. Other shortcuts still work after a click
+// leaves focus on a button.
+function controlOwnsKey(target: EventTarget | null, key: string): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  if (target.isContentEditable || target.closest('input, textarea, select')) return true;
+  if (target.closest('[role="slider"]')) return key.startsWith('Arrow');
+  if (target.closest('button, a')) return key === ' ' || key === 'Enter';
+  return false;
+}
 
 export function AnimationPlayer({
   data,
@@ -97,8 +105,7 @@ export function AnimationPlayer({
     function handleKeyDown(e: KeyboardEvent) {
       // Skip keys something already handled, modifier shortcuts, and keys aimed at a focused control
       if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
-      const target = e.target;
-      if (target instanceof HTMLElement && (target.isContentEditable || target.closest(INTERACTIVE_ELEMENTS))) return;
+      if (controlOwnsKey(e.target, e.key)) return;
 
       switch (e.key) {
         case 'h':
