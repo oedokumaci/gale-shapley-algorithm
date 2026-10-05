@@ -44,9 +44,9 @@ def random_selector(rng: np.random.Generator) -> Selector:
     """Build a uniform-random selector backed by a numpy ``Generator``.
 
     Roth-Vande Vate-style: pick a free proposer uniformly at random each step.
-    Final matching is invariant to selector choice (Knuth's order independence)
-    but the proposal count is not — random order is a useful baseline against
-    LIFO/FIFO for amortized analysis.
+    The final matching and every proposal count are invariant to selector choice
+    (Knuth's order independence: each proposer works down his list to the same
+    final partner in any order); only the order of proposal events changes.
 
     Args:
         rng: a numpy ``Generator`` (use ``np.random.default_rng(seed)`` for
@@ -129,8 +129,9 @@ def gale_shapley_traced(
 
     Mechanically identical to :func:`gale_shapley` (sequential McVitie-Wilson
     on the free-proposer pool), but exposes the proposal count and a
-    pluggable proposer-selection rule. The final matching is invariant under
-    selector choice (Knuth); the proposal count is not.
+    pluggable proposer-selection rule. The final matching and the proposal
+    counts are invariant under selector choice (Knuth); the selector only
+    changes the order in which proposals happen.
 
     Args:
         proposer_rank: ``(n, n)`` array where ``proposer_rank[i, j]`` is
