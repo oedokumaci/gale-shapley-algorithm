@@ -13,6 +13,8 @@ on:
   schedule:
   - cron: "17 6 * * 1"
   workflow_dispatch:
+  # Called by the publish and docker workflows so a release only ships if CI passes.
+  workflow_call:
 
 permissions:
   contents: read
@@ -37,24 +39,24 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v7
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         fetch-depth: 0
         fetch-tags: true
+        persist-credentials: false
 
     - name: Setup Python
-      uses: actions/setup-python@v7
+      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
       with:
         python-version: "3.13"
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
       with:
         enable-cache: true
-        cache-dependency-glob: pyproject.toml
 
     - name: Install dependencies
-      run: uv sync --extra cli --extra gui --extra numeric
+      run: uv sync --locked --extra cli --extra gui --extra numeric
 
     - name: Check code formatting
       run: uvx --from taskipy task format_check
@@ -68,12 +70,6 @@ jobs:
     - name: Build documentation
       run: uvx --from taskipy task docs_build
 
-    - name: Store objects inventory for tests
-      uses: actions/upload-artifact@v7
-      with:
-        name: objects.inv
-        path: site/objects.inv
-
   test:
     needs: quality
     strategy:
@@ -84,30 +80,24 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v7
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         fetch-depth: 0
         fetch-tags: true
+        persist-credentials: false
 
     - name: Setup Python
-      uses: actions/setup-python@v7
+      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
       with:
         python-version: ${{ matrix.python-version }}
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
       with:
         enable-cache: true
-        cache-dependency-glob: pyproject.toml
 
     - name: Install dependencies
-      run: uv sync --extra cli --extra gui --extra numeric --python ${{ matrix.python-version }}
-
-    - name: Download objects inventory
-      uses: actions/download-artifact@v8
-      with:
-        name: objects.inv
-        path: site/
+      run: uv sync --locked --extra cli --extra gui --extra numeric --python ${{ matrix.python-version }}
 
     - name: Run tests
       run: uv run --python ${{ matrix.python-version }} pytest -c config/pytest.ini
@@ -120,33 +110,96 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v7
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         fetch-depth: 0
         fetch-tags: true
+        persist-credentials: false
 
     - name: Setup Python
-      uses: actions/setup-python@v7
+      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
       with:
         python-version: "3.12"
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
       with:
         enable-cache: true
-        cache-dependency-glob: pyproject.toml
 
+    # No --locked here: lowest-direct deliberately re-resolves away from uv.lock.
     - name: Install dependencies (lowest-direct resolution)
       run: uv sync --extra cli --extra gui --extra numeric --resolution lowest-direct
-
-    - name: Download objects inventory
-      uses: actions/download-artifact@v8
-      with:
-        name: objects.inv
-        path: site/
 
     # --no-sync: a plain `uv run` sees the lockfile's lowest-direct resolution mode,
     # re-locks at the highest versions and upgrades the test group, so the declared
     # minimums would never be the ones under test.
     - name: Run tests
       run: uv run --no-sync pytest -c config/pytest.ini
+
+  frontend:
+    # The GUI has no unit tests; lint + type-check + production build catch most
+    # breakage from dependency updates before they reach a release image.
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+
+    - name: Setup Node
+      uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      with:
+        node-version: "24"
+        cache: npm
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Lint
+      run: npm run lint
+
+    - name: Type-check and build
+      run: npm run build
+
+  docker:
+    # Build (without pushing) and run the image the docker workflow publishes, so Dockerfile
+    # and lockfile changes are tested before a release.
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+
+    - name: Setup Docker Buildx
+      uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+    - name: Build image
+      uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+      with:
+        context: .
+        platforms: linux/amd64
+        push: false
+        load: true
+        tags: gale-shapley-algorithm:ci
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Smoke-test the image
+      run: |
+        docker run -d --name app -p 8000:8000 gale-shapley-algorithm:ci
+        trap 'docker logs app; docker rm -f app' EXIT
+        for _ in $(seq 1 30); do curl -sf http://127.0.0.1:8000/api/health && break; sleep 1; done
+        page="$(curl -sf http://127.0.0.1:8000/)"
+        grep -q '<div id="root">' <<< "$page"
+        asset="$(grep -o '/assets/[^"]*\.js' <<< "$page" | head -n 1)"
+        curl -sf -o /dev/null "http://127.0.0.1:8000$asset"
+        curl -sf -X POST http://127.0.0.1:8000/api/matching -H 'content-type: application/json' \
+          -d '{"proposer_preferences": {"a": ["b"]}, "responder_preferences": {"b": ["a"]}}' \
+          | grep -q '"matches":{"a":"b"}'
