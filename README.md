@@ -198,7 +198,7 @@ uvx --from taskipy task docs    # Serve docs locally
 Install pre-commit hooks:
 
 ```bash
-uv run pre-commit install
+uvx pre-commit install
 ```
 
 ## Documentation

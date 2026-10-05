@@ -1,5 +1,5 @@
 # Pre-commit hooks for gale-shapley-algorithm
-# Install: uv run pre-commit install
+# Install: uvx pre-commit install
 # Run all: uvx pre-commit run --all-files
 
 repos:
