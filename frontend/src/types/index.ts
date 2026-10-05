@@ -34,4 +34,7 @@ export interface StepsResponse {
 
 export type AnimationPhase = 'proposals' | 'responses' | 'matches';
 
-export type PersonImages = Record<string, string>;
+export type Side = 'proposers' | 'responders';
+
+// Photo URLs by side, then name: a proposer and a responder may share a name
+export type PersonImages = Record<Side, Record<string, string>>;

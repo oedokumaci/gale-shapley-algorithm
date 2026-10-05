@@ -86,7 +86,7 @@ function App() {
       }
       return updated;
     });
-    removeImage(name);
+    removeImage('proposers', name);
   }, [removeImage]);
 
   const addResponder = useCallback((name: string) => {
@@ -115,7 +115,7 @@ function App() {
       }
       return updated;
     });
-    removeImage(name);
+    removeImage('responders', name);
   }, [removeImage]);
 
   const reorderProposerPref = useCallback((person: string, newOrder: string[]) => {

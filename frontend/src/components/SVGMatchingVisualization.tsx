@@ -391,7 +391,7 @@ export function SVGMatchingVisualization({
           {proposerLayout.positions.map((p, i) => (
             <PersonNode
               key={p.name} name={p.name} cx={PROPOSER_X} cy={p.y}
-              radius={proposerLayout.radius} imageUrl={personImages[p.name]}
+              radius={proposerLayout.radius} imageUrl={personImages.proposers[p.name]}
               status={getProposerStatus(p.name)} side="left" index={i}
             />
           ))}
@@ -400,7 +400,7 @@ export function SVGMatchingVisualization({
           {responderLayout.positions.map((p, i) => (
             <PersonNode
               key={p.name} name={p.name} cx={RESPONDER_X} cy={p.y}
-              radius={responderLayout.radius} imageUrl={personImages[p.name]}
+              radius={responderLayout.radius} imageUrl={personImages.responders[p.name]}
               status={getResponderStatus(p.name)} side="right" index={i}
             />
           ))}

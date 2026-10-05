@@ -5,7 +5,7 @@ import { Separator } from '@/components/ui/separator';
 import { PersonList } from './PersonList';
 import { CompactPreferenceGrid } from './CompactPreferenceGrid';
 import { Shuffle, Trash2 } from 'lucide-react';
-import type { PersonImages } from '@/types';
+import type { PersonImages, Side } from '@/types';
 
 // The cap has to sit on the viewport: with only a max-height on the root, the viewport's
 // height:100% can't resolve, so it grows with the grid and spills out of the card.
@@ -26,7 +26,7 @@ interface PreferenceEditorProps {
   onRandomizePrefs: () => void;
   onClearAll: () => void;
   personImages: PersonImages;
-  onUploadImage: (name: string, file: File) => void;
+  onUploadImage: (side: Side, name: string, file: File) => void;
 }
 
 export function PreferenceEditor({
@@ -78,8 +78,8 @@ export function PreferenceEditor({
             persons={proposerNames}
             onAdd={onAddProposer}
             onRemove={onRemoveProposer}
-            images={personImages}
-            onUploadImage={onUploadImage}
+            images={personImages.proposers}
+            onUploadImage={(name, file) => onUploadImage('proposers', name, file)}
           />
           {proposerNames.length > 0 && responderNames.length > 0 && (
             <>
@@ -113,8 +113,8 @@ export function PreferenceEditor({
             persons={responderNames}
             onAdd={onAddResponder}
             onRemove={onRemoveResponder}
-            images={personImages}
-            onUploadImage={onUploadImage}
+            images={personImages.responders}
+            onUploadImage={(name, file) => onUploadImage('responders', name, file)}
           />
           {proposerNames.length > 0 && responderNames.length > 0 && (
             <>
