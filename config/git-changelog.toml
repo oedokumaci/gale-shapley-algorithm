@@ -1,2 +1,5 @@
 convention = "angular"
 sections = ["feat", "fix", "refactor", "build", "deps", "perf"]
+output = "CHANGELOG.md"
+in-place = true
+provider = "github"
