@@ -7,8 +7,9 @@ import { SVGMatchingVisualization } from '@/components/SVGMatchingVisualization'
 import { HowItWorksDialog } from '@/components/HowItWorksDialog';
 import { usePersonImages } from '@/hooks/usePersonImages';
 import { runMatching, runMatchingSteps } from '@/api/client';
+import { buildFinalStep } from '@/lib/steps';
 import { Sun, Moon, BookOpen, Github } from 'lucide-react';
-import type { MatchingRequest, MatchingResponse, StepsResponse, RoundStep } from '@/types';
+import type { MatchingRequest, MatchingResponse, StepsResponse } from '@/types';
 import {
   DEFAULT_PROPOSER_NAMES,
   DEFAULT_RESPONDER_NAMES,
@@ -32,20 +33,6 @@ function useTheme() {
   }, [dark]);
 
   return { dark, toggle: () => setDark((d) => !d) };
-}
-
-function buildFinalStep(result: MatchingResponse): RoundStep {
-  const matches = Object.entries(result.matches).map(([proposer, responder]) => ({
-    proposer,
-    responder,
-  }));
-  return {
-    round: result.rounds,
-    proposals: [],
-    rejections: [],
-    tentative_matches: matches,
-    self_matches: result.self_matches,
-  };
 }
 
 function App() {
