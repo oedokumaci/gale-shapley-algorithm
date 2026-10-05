@@ -136,6 +136,57 @@ jobs:
     - name: Run tests
       run: uv run --no-sync pytest -c config/pytest.ini
 
+  package:
+    # Build the distributions a release would upload and use them from a clean environment, so a
+    # file missing from the sdist or wheel fails here rather than after it reaches PyPI.
+    needs: quality
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+
+    - name: Setup Python
+      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      with:
+        python-version: "3.13"
+
+    - name: Setup uv
+      uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
+      with:
+        enable-cache: true
+
+    - name: Build sdist and wheel
+      run: uv build
+
+    # --no-cache: the wheel's file URL is the same from run to run, and uv would otherwise reuse a
+    # previously unpacked copy from the restored cache instead of the wheel built above.
+    - name: Import every module from the wheel in an isolated environment
+      run: |
+        wheel="$(echo dist/*.whl)"
+        uv run --no-cache --isolated --no-project --with "gale-shapley-algorithm[cli,gui,numeric] @ file://$PWD/$wheel" python - <<'EOF'
+        import importlib.resources
+
+        import gale_shapley_algorithm as gsa
+        import gale_shapley_algorithm._api.app
+        import gale_shapley_algorithm._cli.app
+        import gale_shapley_algorithm.numeric
+
+        assert "site-packages" in gsa.__file__, gsa.__file__
+        assert importlib.resources.files("gale_shapley_algorithm").joinpath("py.typed").is_file()
+        assert gsa.create_matching({"a": ["b"]}, {"b": ["a"]}).matches == {"a": "b"}
+        EOF
+
+    - name: Run the test suite from the unpacked sdist
+      run: |
+        mkdir sdist-check
+        tar -xzf dist/*.tar.gz -C sdist-check --strip-components=1
+        cd sdist-check
+        uv sync --extra cli --extra gui --extra numeric
+        uv run pytest -c config/pytest.ini
+
   frontend:
     # The GUI has no unit tests; lint + type-check + production build catch most
     # breakage from dependency updates before they reach a release image.
