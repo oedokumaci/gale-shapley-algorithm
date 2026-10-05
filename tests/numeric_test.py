@@ -13,7 +13,7 @@ import itertools
 import numpy as np
 import pytest
 
-from gale_shapley_algorithm import Algorithm, Proposer, Responder
+from gale_shapley_algorithm import Algorithm, Proposer, Responder, create_matching
 from gale_shapley_algorithm.numeric import (
     GSStats,
     apply_rotation,
@@ -84,6 +84,23 @@ def test_numeric_gs_matches_symbolic_on_random_instances(rng: np.random.Generato
         theirs = _symbolic_men_optimal(men, women)
         assert np.array_equal(ours, theirs)
         assert is_stable(men, women, ours)
+
+
+def _name_preferences(rank: np.ndarray, own: str, other: str) -> dict[str, list[str]]:
+    """Turn a rank matrix into create_matching's {name: [names in preference order]} form."""
+    return {f"{own}{i}": [f"{other}{int(j)}" for j in np.argsort(row)] for i, row in enumerate(rank)}
+
+
+@pytest.mark.parametrize("n", [1, 2, 3, 5, 8, 13, 21, 34])
+def test_create_matching_agrees_with_numeric_gs(n: int) -> None:
+    """create_matching (Person-based) and numeric gale_shapley find the same proposer-optimal matching."""
+    rng = np.random.default_rng(1000 + n)
+    for _ in range(25):
+        men, women = _random_instance(n, rng)
+        result = create_matching(_name_preferences(men, "m", "w"), _name_preferences(women, "w", "m"))
+        expected = gale_shapley(men, women)
+        assert result.matches == {f"m{i}": f"w{int(expected[i])}" for i in range(n)}
+        assert result.all_matched
 
 
 def test_women_optimal_is_stable(rng: np.random.Generator) -> None:
