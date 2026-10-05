@@ -66,3 +66,25 @@ updates:
     commit-message:
       prefix: "ci"
       include: "scope"
+
+  # Dockerfile base images, pinned by digest. Digest updates within a tag (base-image
+  # security patches) flow through; Node and Python version jumps stay deliberate.
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    cooldown:
+      default-days: 7
+    groups:
+      docker:
+        patterns: ["*"]
+    ignore:
+      - dependency-name: "node"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "python"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+    commit-message:
+      prefix: "build"
+      include: "scope"
