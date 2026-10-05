@@ -5,31 +5,38 @@ permissions:
 
 on:
   release:
-    types: [created]
+    types: [published]
 
 jobs:
+  ci:
+    # Only publish what passes the full CI suite.
+    uses: ./.github/workflows/ci.yml
+
   docker:
+    needs: ci
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v7
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
 
     - name: Setup QEMU
-      uses: docker/setup-qemu-action@v4
+      uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
 
     - name: Setup Docker Buildx
-      uses: docker/setup-buildx-action@v4
+      uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
     - name: Login to Docker Hub
-      uses: docker/login-action@v4
+      uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Extract metadata
       id: meta
-      uses: docker/metadata-action@v6
+      uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
       with:
         images: oedokumaci/gale-shapley-algorithm
         tags: |
@@ -38,7 +45,7 @@ jobs:
           type=semver,pattern={{major}}
 
     - name: Build and push
-      uses: docker/build-push-action@v7
+      uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
       with:
         context: .
         platforms: linux/amd64,linux/arm64
@@ -49,5 +56,7 @@ jobs:
           CREATED=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
           VERSION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
           REVISION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
+        # GitHub Actions caches written from pull requests are scoped to that PR and are
+        # never visible to tag builds, so this only reuses layers built on main or tags.
         cache-from: type=gha
         cache-to: type=gha,mode=max

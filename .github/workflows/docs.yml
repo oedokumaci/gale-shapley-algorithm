@@ -7,12 +7,11 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
+# Never cancel a run mid-deploy; a newer push waits and then deploys its own build.
 concurrency:
   group: docs
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 defaults:
   run:
@@ -24,36 +23,40 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v7
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         fetch-depth: 0
         fetch-tags: true
+        persist-credentials: false
 
     - name: Setup Python
-      uses: actions/setup-python@v7
+      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
       with:
         python-version: "3.13"
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
       with:
         enable-cache: true
-        cache-dependency-glob: pyproject.toml
 
     - name: Install dependencies
-      run: uvx --from taskipy task setup
+      run: uv sync --locked --extra cli --extra gui --extra numeric
 
     - name: Build documentation
       run: uvx --from taskipy task docs_build
 
     - name: Upload pages artifact
-      uses: actions/upload-pages-artifact@v5
+      uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
       with:
         path: site/
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    # Only the deploy job can write to Pages.
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -61,4 +64,4 @@ jobs:
     steps:
     - name: Deploy to GitHub Pages
       id: deployment
-      uses: actions/deploy-pages@v5
+      uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
