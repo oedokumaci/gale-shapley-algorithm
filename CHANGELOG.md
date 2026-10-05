@@ -6,6 +6,35 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v1.8.1](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.8.1) - 2026-10-05
+
+<small>[Compare with v1.8.0](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.8.0...v1.8.1)</small>
+
+### Bug Fixes
+
+- stop repeated preference entries from hanging the algorithm: a name listed twice in a proposer's preferences made `execute()` loop forever. The GUI API now also rejects repeated names with a 422 and caps each side at 100 people ([dc016bd](https://github.com/oedokumaci/gale-shapley-algorithm/commit/dc016bdf9ae1804aaa9a9c5ac8f806e9fb6983ce) by oedokumaci).
+- `find_blocking_pairs` no longer reports a blocking pair with an unmatched responder who finds the proposer unacceptable ([a5e1024](https://github.com/oedokumaci/gale-shapley-algorithm/commit/a5e102499cf2845712b728552a2704155e5324e0) by oedokumaci).
+
+### Security
+
+- bump anyio from 4.14.0 to 4.14.2 in the locked environment the Docker image uses (GHSA-82r6-8w77-94w6, critical; GHSA-3w57-8xmc-8v26; GHSA-5p39-cfhj-2xmp) ([e4f5e90](https://github.com/oedokumaci/gale-shapley-algorithm/commit/e4f5e90bd9426e7fbbe176d447405eff4c340e18) by dependabot[bot]).
+- bump httpx2 to 2.13.1 (GHSA-8xx6-hgc6-gc2m, GHSA-h4x7-gw46-3wm6, GHSA-pf96-p4fj-6566) and virtualenv to 21.7.13 ([4132022](https://github.com/oedokumaci/gale-shapley-algorithm/commit/41320221fc430280146cc6960e643049a235c132), [a1b50cd](https://github.com/oedokumaci/gale-shapley-algorithm/commit/a1b50cd8734bca8ca90ef3e8a623002c61b76725) by dependabot[bot]).
+- drop the shadcn CLI from the frontend toolchain, which clears all npm advisories ([bdd7cc1](https://github.com/oedokumaci/gale-shapley-algorithm/commit/bdd7cc11d4e3f7931c2f750c80d712d9ece00318) by oedokumaci).
+
+### Build
+
+- the `cli` extra now requires `typer>=0.26` and `rich>=13.8`; older typer imports a Click API that Click 9 removes ([5b57137](https://github.com/oedokumaci/gale-shapley-algorithm/commit/5b5713754301a6b0addab9e8cc9103a79428e14c) by oedokumaci).
+- routine dependency updates (uv and npm groups, starlette 1.3.1, pymdown-extensions 11, React 19.3, Vite 8.3); see the [full comparison](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.8.0...v1.8.1).
+
+### Docs
+
+- `gale_shapley_traced` and `random_selector` docstrings no longer claim the proposal count depends on the selector; it does not ([8c0fbc2](https://github.com/oedokumaci/gale-shapley-algorithm/commit/8c0fbc241fddaced2c7127268b0d0d3a426a27d0) by oedokumaci).
+
+### Tests / CI
+
+- `test-min-deps` now tests the declared minimum versions, and CI also runs weekly ([5b57137](https://github.com/oedokumaci/gale-shapley-algorithm/commit/5b5713754301a6b0addab9e8cc9103a79428e14c), [9a89716](https://github.com/oedokumaci/gale-shapley-algorithm/commit/9a8971613b8bcb9aaaf0b3cf943c8f87e9fadb5b) by oedokumaci).
+- `task setup` installs the `numeric` extra, and `task changelog` now writes `CHANGELOG.md` ([9de091d](https://github.com/oedokumaci/gale-shapley-algorithm/commit/9de091dac8d24b50433d327b933333ffc78a6b68), [319515f](https://github.com/oedokumaci/gale-shapley-algorithm/commit/319515ff8387dd8feb9188b99df7ee215fc1389d) by oedokumaci).
+
 ## [v1.8.0](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.8.0) - 2026-04-30
 
 <small>[Compare with v1.7.0](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.7.0...v1.8.0)</small>
@@ -301,4 +330,3 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Build
 
 - bump pydantic from 1.10.8 to 1.10.13 in the pip group across 1 directory (#15) ([d243318](https://github.com/oedokumaci/gale-shapley-algorithm/commit/d243318b6fff6035e82a4b250d7c0226b40c8e3d) by dependabot[bot]).
-
