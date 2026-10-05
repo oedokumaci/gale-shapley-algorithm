@@ -31,8 +31,9 @@ def _build_algorithm(
         prefs: list[Proposer | Responder] = [responders[r] for r in pref_names if r in responders]
         if p not in prefs:
             prefs.append(p)
+        listed = set(prefs)
         for r in responders.values():
-            if r not in prefs:
+            if r not in listed:
                 prefs.append(r)
         p.preferences = tuple(prefs)
 
@@ -41,8 +42,9 @@ def _build_algorithm(
         prefs_r: list[Proposer | Responder] = [proposers[p] for p in pref_names if p in proposers]
         if r not in prefs_r:
             prefs_r.append(r)
+        listed_r = set(prefs_r)
         for p in proposers.values():
-            if p not in prefs_r:
+            if p not in listed_r:
                 prefs_r.append(p)
         r.preferences = tuple(prefs_r)
 
