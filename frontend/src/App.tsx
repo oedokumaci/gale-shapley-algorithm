@@ -48,6 +48,12 @@ function App() {
 
   const [result, setResult] = useState<MatchingResponse | null>(null);
   const [stepsData, setStepsData] = useState<StepsResponse | null>(null);
+  // The people the shown result was computed for. Captured when the request is sent, so edits
+  // made while it is in flight can't make the visualization disagree with the result.
+  const [submittedNames, setSubmittedNames] = useState<{ proposers: string[]; responders: string[] }>({
+    proposers: [],
+    responders: [],
+  });
   const [viewMode, setViewMode] = useState<ViewMode>('edit');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -142,11 +148,13 @@ function App() {
   const canRun = proposerNames.length > 0 && responderNames.length > 0;
 
   async function handleRunMatching() {
+    const names = { proposers: proposerNames, responders: responderNames };
     setLoading(true);
     setError(null);
     try {
       const res = await runMatching(buildRequest());
       setResult(res);
+      setSubmittedNames(names);
       setStepsData(null);
       setViewMode('results');
     } catch (e) {
@@ -157,11 +165,13 @@ function App() {
   }
 
   async function handleRunAnimation() {
+    const names = { proposers: proposerNames, responders: responderNames };
     setLoading(true);
     setError(null);
     try {
       const res = await runMatchingSteps(buildRequest());
       setStepsData(res);
+      setSubmittedNames(names);
       setResult(null);
       setViewMode('animation');
     } catch (e) {
@@ -257,8 +267,8 @@ function App() {
             <SVGMatchingVisualization
               step={buildFinalStep(result)}
               phase="matches"
-              proposerNames={proposerNames}
-              responderNames={responderNames}
+              proposerNames={submittedNames.proposers}
+              responderNames={submittedNames.responders}
               personImages={personImages}
               onStepBack={() => {}}
               onStepForward={() => {}}
@@ -273,8 +283,8 @@ function App() {
         {viewMode === 'animation' && stepsData && (
           <AnimationPlayer
             data={stepsData}
-            proposerNames={proposerNames}
-            responderNames={responderNames}
+            proposerNames={submittedNames.proposers}
+            responderNames={submittedNames.responders}
             personImages={personImages}
           />
         )}
