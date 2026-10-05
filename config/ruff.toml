@@ -19,10 +19,6 @@ ignore = [
     "COM812", # Missing trailing comma
     "ISC001", # Implicit string concatenation
 
-    # --- Logging (CLI subpackage uses stdlib logging) ---
-    "LOG015", # Root logger calls
-    "G004",   # Logging f-string
-
     # --- Opinionated ignores ---
     "CPY",    # Copyright notice at top of files (no copyright-header convention)
     "ANN",    # Type annotations (already typed, too strict for all cases)
