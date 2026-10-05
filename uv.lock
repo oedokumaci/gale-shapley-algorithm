@@ -242,11 +242,11 @@ requires-dist = [
     { name = "fastapi", marker = "extra == 'gui'", specifier = ">=0.115" },
     { name = "numpy", marker = "extra == 'numeric'", specifier = ">=2.0" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.0" },
-    { name = "rich", marker = "extra == 'cli'", specifier = ">=13.7" },
-    { name = "rich", marker = "extra == 'dev'", specifier = ">=13.7" },
+    { name = "rich", marker = "extra == 'cli'", specifier = ">=13.8" },
+    { name = "rich", marker = "extra == 'dev'", specifier = ">=13.8" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.9" },
-    { name = "typer", marker = "extra == 'cli'", specifier = ">=0.16" },
-    { name = "typer", marker = "extra == 'dev'", specifier = ">=0.16" },
+    { name = "typer", marker = "extra == 'cli'", specifier = ">=0.26" },
+    { name = "typer", marker = "extra == 'dev'", specifier = ">=0.26" },
     { name = "uvicorn", extras = ["standard"], marker = "extra == 'gui'", specifier = ">=0.30" },
 ]
 provides-extras = ["cli", "dev", "gui", "numeric"]
@@ -261,7 +261,7 @@ docs = [
 test = [
     { name = "httpx", specifier = ">=0.27" },
     { name = "httpx2", specifier = ">=2.0" },
-    { name = "pytest", specifier = ">=7.2" },
+    { name = "pytest", specifier = ">=7.4" },
     { name = "pytest-cov", specifier = ">=4.0" },
     { name = "pytest-randomly", specifier = ">=3.12" },
 ]

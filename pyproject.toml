@@ -31,7 +31,7 @@ dependencies = []
 [project.optional-dependencies]
 # Lower bounds verified by CI's test-min-deps job (uv --resolution lowest-direct).
 # Don't loosen any of these without running that job locally first.
-cli = ["typer>=0.16", "rich>=13.7"]
+cli = ["typer>=0.26", "rich>=13.8"]
 gui = ["fastapi>=0.115", "uvicorn[standard]>=0.30"]
 numeric = ["numpy>=2.0"]
 dev = ["gale-shapley-algorithm[cli]", "pre-commit>=3.0", "ruff>=0.9"]
@@ -52,7 +52,7 @@ packages = ["src/gale_shapley_algorithm"]
 
 [dependency-groups]
 test = [
-    "pytest>=7.2",
+    "pytest>=7.4",
     "pytest-cov>=4.0",
     "pytest-randomly>=3.12",
     # TestClient HTTP backend: starlette<1.3 uses httpx, starlette>=1.3 uses httpx2.
