@@ -31,6 +31,8 @@ docker build -t gale-shapley-algorithm .
 docker run --rm -p 8000:8000 gale-shapley-algorithm
 ```
 
+The web GUI ships in the Docker image; the `gui` extra on PyPI installs only the API server behind it.
+
 The GUI lets you:
 
 - **Add and remove people** on each side (proposers and responders)
