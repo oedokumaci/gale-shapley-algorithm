@@ -56,7 +56,6 @@ jobs:
           CREATED=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
           VERSION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
           REVISION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
-        # GitHub Actions caches written from pull requests are scoped to that PR and are
-        # never visible to tag builds, so this only reuses layers built on main or tags.
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+        # Deliberately no cache-from/cache-to: tag builds can read caches saved by any run
+        # on main (including ci.yml's docker job), so a poisoned entry could end up in the
+        # published image. Release builds start from scratch.
