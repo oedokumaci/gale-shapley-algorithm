@@ -1,6 +1,6 @@
 """Tests for the create_matching convenience function."""
 
-from gale_shapley_algorithm.matching import create_matching
+from gale_shapley_algorithm.matching import _build_algorithm, create_matching
 from gale_shapley_algorithm.result import MatchingResult
 
 
@@ -46,3 +46,17 @@ class TestCreateMatching:
         assert "m1" in result.self_matches
         assert "w1" in result.self_matches
         assert not result.all_matched
+
+    def test_repeated_preference_entry_terminates(self) -> None:
+        """A name listed twice used to make its proposer re-propose to it forever."""
+        algorithm = _build_algorithm({"P1": ["A", "A"], "P2": ["A"]}, {"A": ["P2", "P1"]})
+        # GS finishes within |P| * (|R| + 1) rounds; bounding the loop makes a regression fail instead of hang.
+        for _ in range(10):
+            if algorithm.terminate():
+                break
+            algorithm.proposers_propose()
+            algorithm.responders_respond()
+        assert algorithm.terminate()
+        result = algorithm.execute()
+        assert result.matches == {"P2": "A"}
+        assert result.self_matches == ["P1"]

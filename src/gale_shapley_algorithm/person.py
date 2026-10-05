@@ -64,8 +64,10 @@ class Proposer(Person):
 
     @property
     def acceptable_to_propose(self) -> tuple[Responder | Proposer, ...]:
-        """Returns a tuple of acceptable responders to propose to."""
-        return tuple(filter(self.is_acceptable, self.preferences))
+        """Returns a tuple of acceptable responders to propose to, each once, in preference order."""
+        # Keep only the first copy of a repeated entry: next_proposal looks up last_proposal with
+        # .index(), which finds the first copy, so a repeat would be re-proposed to forever.
+        return tuple(dict.fromkeys(filter(self.is_acceptable, self.preferences)))
 
     @property
     def next_proposal(self) -> Responder | Proposer:

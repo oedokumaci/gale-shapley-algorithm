@@ -89,6 +89,23 @@ class TestProposer:
         m.last_proposal = w1
         assert m.next_proposal == w2
 
+    def test_acceptable_to_propose_skips_repeated_entries(self) -> None:
+        """A responder listed twice is proposed to once, at its first position."""
+        m = Proposer("m", "man")
+        w1 = Responder("w1", "woman")
+        w2 = Responder("w2", "woman")
+        m.preferences = (w1, w1, w2, m)
+        assert m.acceptable_to_propose == (w1, w2, m)
+
+    def test_next_proposal_moves_past_repeated_entry(self) -> None:
+        """Re-proposing to a repeated responder used to loop forever."""
+        m = Proposer("m", "man")
+        w1 = Responder("w1", "woman")
+        w2 = Responder("w2", "woman")
+        m.preferences = (w1, w1, w2, m)
+        m.last_proposal = w1
+        assert m.next_proposal == w2
+
     def test_next_proposal_exhausted_returns_self(self) -> None:
         """When all acceptable proposals exhausted, returns self via IndexError."""
         m = Proposer("m", "man")
