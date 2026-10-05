@@ -140,5 +140,8 @@ jobs:
         name: objects.inv
         path: site/
 
+    # --no-sync: a plain `uv run` sees the lockfile's lowest-direct resolution mode,
+    # re-locks at the highest versions and upgrades the test group, so the declared
+    # minimums would never be the ones under test.
     - name: Run tests
-      run: uv run pytest -c config/pytest.ini
+      run: uv run --no-sync pytest -c config/pytest.ini
