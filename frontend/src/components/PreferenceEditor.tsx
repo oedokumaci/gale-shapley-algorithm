@@ -7,6 +7,11 @@ import { CompactPreferenceGrid } from './CompactPreferenceGrid';
 import { Shuffle, Trash2 } from 'lucide-react';
 import type { PersonImages } from '@/types';
 
+// The cap has to sit on the viewport: with only a max-height on the root, the viewport's
+// height:100% can't resolve, so it grows with the grid and spills out of the card.
+// 420px fits the default 6x6 grid (404px) on wide screens; larger grids scroll.
+const GRID_SCROLL_AREA = '[&>[data-slot=scroll-area-viewport]]:max-h-[420px]';
+
 interface PreferenceEditorProps {
   proposerNames: string[];
   responderNames: string[];
@@ -85,7 +90,7 @@ export function PreferenceEditor({
                   (drag to reorder)
                 </span>
               </h4>
-              <ScrollArea className="max-h-[400px]">
+              <ScrollArea className={GRID_SCROLL_AREA}>
                 <CompactPreferenceGrid
                   names={proposerNames}
                   prefs={proposerPrefs}
@@ -120,7 +125,7 @@ export function PreferenceEditor({
                   (drag to reorder)
                 </span>
               </h4>
-              <ScrollArea className="max-h-[400px]">
+              <ScrollArea className={GRID_SCROLL_AREA}>
                 <CompactPreferenceGrid
                   names={responderNames}
                   prefs={responderPrefs}
