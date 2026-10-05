@@ -2,7 +2,7 @@
 .github
 .venv
 .claude
-.cursor
+.agents
 openspec
 __pycache__
 *.pyc

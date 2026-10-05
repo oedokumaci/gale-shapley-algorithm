@@ -1,6 +1,7 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance for AI assistants working on this codebase.
+This file provides guidance for AI coding agents working on this codebase. Claude Code, Codex, and Cursor
+all read it natively. There is deliberately no CLAUDE.md: Claude Code only reads AGENTS.md when CLAUDE.md is absent.
 
 ## Project Overview
 
@@ -17,7 +18,8 @@ This file provides guidance for AI assistants working on this codebase.
 ## Quick Reference
 
 ```bash
-uvx --from taskipy task setup        # Install dependencies
+uvx --from taskipy task setup        # Install dependencies and link agent skills
+uvx --from taskipy task agents_link  # Link .agents/skills into .claude/skills (Claude Code)
 uvx --from taskipy task run          # Run the application
 uvx --from taskipy task fix          # Auto-format + lint fix
 uvx --from taskipy task ci           # Run all CI checks (format, lint, typecheck, test)
@@ -37,7 +39,7 @@ uvx --from taskipy task changelog    # Update changelog (for releases)
 
 ## Task Independence
 
-Each Claude Code session is independent — there is no built-in multi-phase pipeline. Structure your requests as self-contained tasks. For multi-step workflows, complete each step fully before starting the next.
+Each agent session is independent — there is no built-in multi-phase pipeline. Structure your requests as self-contained tasks. For multi-step workflows, complete each step fully before starting the next.
 
 ## Development Workflow
 
@@ -82,8 +84,7 @@ if TYPE_CHECKING:
 
 ```
 gale-shapley-algorithm/
-├── .claude/skills/       # Claude Code skills (/commit, /fix, /test, etc.)
-├── .cursor/              # Cursor IDE (rules -> CLAUDE.md, skills -> .claude/skills)
+├── .agents/skills/       # Agent skills (/commit, /fix, /test, etc.), the only tracked copy
 ├── src/gale_shapley_algorithm/
 │   ├── __init__.py       # Public API
 │   ├── __main__.py       # Module entry point (run via `task run`)
@@ -111,7 +112,9 @@ gale-shapley-algorithm/
 
 ## Skills
 
-Skills are available in `.claude/skills/` (also symlinked at `.cursor/skills/` for Cursor IDE). Invoke with `/skill-name`:
+Skills live in `.agents/skills/` (Agent Skills format), the only tracked copy. Codex, Cursor, Copilot, and
+Gemini CLI read that folder directly. Claude Code reads only `.claude/skills/`, so `task setup` (or
+`task agents_link`) symlinks each skill there; `.claude/` is git-ignored. Invoke with `/skill-name`:
 
 | Skill | Description |
 |-------|-------------|
@@ -121,6 +124,7 @@ Skills are available in `.claude/skills/` (also symlinked at `.cursor/skills/` f
 | `/fix` | Auto-format and lint code |
 | `/release` | Perform a project release |
 | `/review` | Perform code review |
+| `/openspec-*` | OpenSpec change workflow (new, continue, apply, verify, archive, ...) |
 
 ## Key Files
 
