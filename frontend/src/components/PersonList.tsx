@@ -2,14 +2,13 @@ import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { X, Camera } from 'lucide-react';
-import type { PersonImages } from '@/types';
 
 interface PersonListProps {
   label: string;
   persons: string[];
   onAdd: (name: string) => void;
   onRemove: (name: string) => void;
-  images?: PersonImages;
+  images?: Record<string, string>; // this side's photos, by name
   onUploadImage?: (name: string, file: File) => void;
 }
 
