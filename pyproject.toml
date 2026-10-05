@@ -95,7 +95,7 @@ run = { cmd = "uv run python -m {module}", help = "Run module entrypoint" }
 gui = { cmd = "uv run uvicorn gale_shapley_algorithm._api.app:app --reload --port 8000", help = "Run GUI dev server" }
 
 # Setup
-setup = { cmd = "uv sync --extra cli --extra gui && task agents_link", help = "Install dependencies and link agent skills" }
+setup = { cmd = "uv sync --extra cli --extra gui --extra numeric && task agents_link", help = "Install dependencies and link agent skills" }
 # Claude Code reads skills only from .claude/skills (git-ignored), so link each skill tracked in .agents/skills.
 # Only creates missing links; never deletes or overwrites anything.
 agents_link = { cmd = "bash -c 'mkdir -p .claude/skills; for d in .agents/skills/*/; do [ -d \"$d\" ] || continue; n=$(basename \"$d\"); t=.claude/skills/$n; if [ -L \"$t\" ]; then continue; fi; if [ -e \"$t\" ]; then echo \"skip $t: exists and is not a symlink\"; continue; fi; ln -s ../../.agents/skills/$n \"$t\"; done'", help = "Link .agents/skills into .claude/skills for Claude Code" }
