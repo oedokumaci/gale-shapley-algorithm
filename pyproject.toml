@@ -49,6 +49,20 @@ path = "src/gale_shapley_algorithm/__init__.py"
 [tool.hatch.build.targets.wheel]
 packages = ["src/gale_shapley_algorithm"]
 
+# Allowlist: without it the sdist picks up everything not git-ignored at the repo root
+# (.agents/, .github/, docs/, the frontend, and frontend/node_modules after a local npm ci,
+# because hatchling ignores the nested frontend/.gitignore). Hatchling also always adds
+# pyproject.toml, README.md, LICENSE and .gitignore, and generates PKG-INFO.
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+    "/tests",
+    "/config",
+    "/examples",
+    "/CHANGELOG.md",
+    "/CITATION.cff",
+]
+
 [dependency-groups]
 test = [
     "pytest>=7.4",
