@@ -42,7 +42,6 @@ Documentation = "https://oedokumaci.github.io/gale-shapley-algorithm"
 Changelog = "https://oedokumaci.github.io/gale-shapley-algorithm/changelog"
 Repository = "https://github.com/oedokumaci/gale-shapley-algorithm"
 Issues = "https://github.com/oedokumaci/gale-shapley-algorithm/issues"
-Discussions = "https://github.com/oedokumaci/gale-shapley-algorithm/discussions"
 
 [tool.hatch.version]
 path = "src/gale_shapley_algorithm/__init__.py"
