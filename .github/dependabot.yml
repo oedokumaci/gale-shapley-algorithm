@@ -7,12 +7,20 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 5
+    # Hold new releases for a week before proposing them (time for a compromised
+    # release to be yanked). Security updates are not delayed.
+    cooldown:
+      default-days: 7
     groups:
       uv:
         patterns: ["*"]
+      # Without this, every advisory opens its own PR.
+      uv-security:
+        applies-to: security-updates
+        patterns: ["*"]
     commit-message:
-      prefix: "build(deps)"
-      prefix-development: "build(deps-dev)"
+      # include: "scope" appends "(deps)" or "(deps-dev)" to the prefix itself.
+      prefix: "build"
       include: "scope"
 
   # Frontend npm deps (served by the FastAPI GUI backend).
@@ -22,11 +30,16 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
     groups:
       npm_and_yarn:
         patterns: ["*"]
-    # The frontend has no automated test coverage, so major bumps on icon /
-    # type-system packages that tend to ship breaking renames or removals
+      npm-security:
+        applies-to: security-updates
+        patterns: ["*"]
+    # The frontend has no unit tests (CI only lints and builds it), so major bumps on
+    # icon / type-system packages that tend to ship breaking renames or removals
     # are ignored here and should be handled via a targeted PR that reviews
     # the migration. Minor / patch updates still flow through.
     ignore:
@@ -35,20 +48,21 @@ updates:
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
     commit-message:
-      prefix: "build(deps)"
-      prefix-development: "build(deps-dev)"
+      prefix: "build"
       include: "scope"
 
-  # GitHub Actions version pins.
+  # GitHub Actions, pinned by commit SHA with a version comment that Dependabot keeps in sync.
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 3
+    cooldown:
+      default-days: 7
     groups:
       actions:
         patterns: ["*"]
     commit-message:
-      prefix: "ci(deps)"
+      prefix: "ci"
       include: "scope"
