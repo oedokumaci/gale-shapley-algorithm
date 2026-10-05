@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 interface PersonNodeProps {
   name: string;
   cx: number;
@@ -50,6 +52,9 @@ const STATUS_STYLES: Record<PersonNodeProps['status'], StatusStyle> = {
 };
 
 export function PersonNode({ name, cx, cy, radius, imageUrl, status, side, index }: PersonNodeProps) {
+  // Remember which URL failed (not just that one did), so a different photo still gets a try
+  const [failedUrl, setFailedUrl] = useState<string>();
+  const showImage = !!imageUrl && imageUrl !== failedUrl;
   const style = STATUS_STYLES[status];
   const clipId = `clip-${side}-${index}`;
   const textX = side === 'left' ? cx - radius - 4 : cx + radius + 4;
@@ -84,7 +89,7 @@ export function PersonNode({ name, cx, cy, radius, imageUrl, status, side, index
       />
 
       {/* Image if present */}
-      {imageUrl && (
+      {showImage && (
         <image
           href={imageUrl}
           x={cx - radius + 2}
@@ -93,11 +98,12 @@ export function PersonNode({ name, cx, cy, radius, imageUrl, status, side, index
           height={(radius - 2) * 2}
           clipPath={`url(#${clipId})`}
           preserveAspectRatio="xMidYMid slice"
+          onError={() => setFailedUrl(imageUrl)}
         />
       )}
 
-      {/* Initials if no image */}
-      {!imageUrl && (
+      {/* Initials if no image, or it failed to load */}
+      {!showImage && (
         <text
           x={cx}
           y={cy + 1}
