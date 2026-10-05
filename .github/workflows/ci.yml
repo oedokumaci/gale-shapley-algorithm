@@ -8,6 +8,11 @@ on:
   pull_request:
     branches:
     - main
+  # Weekly run so new upstream releases that break main (e.g. a deprecation that
+  # pytest turns into an error under test-min-deps) surface before the next PR.
+  schedule:
+  - cron: "17 6 * * 1"
+  workflow_dispatch:
 
 permissions:
   contents: read
