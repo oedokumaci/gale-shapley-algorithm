@@ -17,6 +17,9 @@ interface AnimationPlayerProps {
 
 const PHASES: AnimationPhase[] = ['proposals', 'responses', 'matches'];
 
+// Focused controls keep their keys (Space on a button, arrows on the speed slider, typing in a field)
+const INTERACTIVE_ELEMENTS = 'button, a, input, textarea, select, [role="slider"]';
+
 export function AnimationPlayer({
   data,
   proposerNames,
@@ -92,8 +95,10 @@ export function AnimationPlayer({
   // Keyboard shortcuts
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      // Don't capture if user is typing in an input
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      // Skip keys something already handled, modifier shortcuts, and keys aimed at a focused control
+      if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      const target = e.target;
+      if (target instanceof HTMLElement && (target.isContentEditable || target.closest(INTERACTIVE_ELEMENTS))) return;
 
       switch (e.key) {
         case 'h':
