@@ -66,3 +66,6 @@ memray-*.html
 
 # Openspec
 openspec/
+
+# Claude Code: local skill links (task agents_link) and settings; skills are tracked in .agents/skills
+.claude/
