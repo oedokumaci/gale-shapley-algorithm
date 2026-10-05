@@ -26,7 +26,8 @@ def find_blocking_pairs(proposers: list[Proposer], responders: list[Responder]) 
     """Find all blocking pairs in a matching.
 
     A blocking pair (p, r) exists when proposer p and responder r both prefer
-    each other over their current matches.
+    each other over their current matches. A responder whose match is None
+    counts as single, so she blocks only with proposers she finds acceptable.
 
     Args:
         proposers: List of proposers in the matching.
@@ -46,7 +47,9 @@ def find_blocking_pairs(proposers: list[Proposer], responders: list[Responder]) 
                 continue
 
             match responder.is_matched:
-                case False:
+                case False if all(
+                    item in responder.preferences for item in [proposer, responder]
+                ) and responder.is_acceptable(proposer):
                     blocking.append((proposer.name, responder.name))
                 case True if (
                     bool(responder.preferences)

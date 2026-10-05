@@ -38,6 +38,17 @@ class TestFindBlockingPairs:
         blocking = find_blocking_pairs([m1, m2], [w1, w2])
         assert any(bp == ("m1", "w1") for bp in blocking)
 
+    def test_unmatched_responder_who_finds_proposer_unacceptable_does_not_block(self) -> None:
+        """An unmatched responder only blocks with a proposer she finds acceptable."""
+        m = Proposer("m", "man")
+        w = Responder("w", "woman")
+        m.preferences = (w, m)
+        w.preferences = (w, m)  # w prefers staying single to m
+        m.match = m
+        w.match = None
+
+        assert find_blocking_pairs([m], [w]) == []
+
     def test_blocking_pair_responder_prefers_proposer(self) -> None:
         """A blocking pair when responder prefers a different proposer."""
         m1 = Proposer("m1", "man")
