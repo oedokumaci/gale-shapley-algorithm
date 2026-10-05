@@ -4,6 +4,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from gale_shapley_algorithm._api.app import app
+from gale_shapley_algorithm._api.models import MAX_PEOPLE_PER_SIDE
 
 
 @pytest.fixture
@@ -116,6 +117,37 @@ class TestMatching:
         )
         assert response.status_code == 422
         assert "alice_typo" in response.text
+
+    @pytest.mark.parametrize("endpoint", ["/api/matching", "/api/matching/steps"])
+    def test_rejects_repeated_preference_entry(self, client: TestClient, endpoint: str) -> None:
+        """A repeated name is almost certainly a mistake, so report it instead of guessing."""
+        response = client.post(
+            endpoint,
+            json={
+                "proposer_preferences": {"P1": ["A", "A"], "P2": ["A"]},
+                "responder_preferences": {"A": ["P2", "P1"]},
+            },
+        )
+        assert response.status_code == 422
+        assert "repeat" in response.text
+
+    def test_rejects_oversized_side(self, client: TestClient) -> None:
+        """Large inputs would tie up a worker for seconds, so they are refused up front."""
+        proposers = {f"p{i}": [] for i in range(MAX_PEOPLE_PER_SIDE + 1)}
+        response = client.post(
+            "/api/matching",
+            json={"proposer_preferences": proposers, "responder_preferences": {"r": []}},
+        )
+        assert response.status_code == 422
+        assert str(MAX_PEOPLE_PER_SIDE) in response.text
+
+    def test_accepts_side_at_size_limit(self, client: TestClient) -> None:
+        proposers = {f"p{i}": [] for i in range(MAX_PEOPLE_PER_SIDE)}
+        response = client.post(
+            "/api/matching",
+            json={"proposer_preferences": proposers, "responder_preferences": {"r": []}},
+        )
+        assert response.status_code == 200
 
 
 class TestMatchingSteps:
