@@ -238,9 +238,17 @@ jobs:
       run: npm run build
 
   docker:
-    # Build (without pushing) and run the image the docker workflow publishes, so Dockerfile
-    # and lockfile changes are tested before a release.
-    runs-on: ubuntu-latest
+    # Build (without pushing) and run the image the docker workflow publishes, natively on each
+    # platform it publishes, so Dockerfile and lockfile changes are tested before a release.
+    name: docker (${{ matrix.platform }})
+    strategy:
+      matrix:
+        include:
+        - platform: linux/amd64
+          runner: ubuntu-latest
+        - platform: linux/arm64
+          runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
 
     steps:
     - name: Checkout
@@ -255,12 +263,12 @@ jobs:
       uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
       with:
         context: .
-        platforms: linux/amd64
+        platforms: ${{ matrix.platform }}
         push: false
         load: true
         tags: gale-shapley-algorithm:ci
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+        cache-from: type=gha,scope=${{ matrix.runner }}
+        cache-to: type=gha,mode=max,scope=${{ matrix.runner }}
 
     - name: Smoke-test the image
       run: |
