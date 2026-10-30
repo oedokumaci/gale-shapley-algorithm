@@ -98,7 +98,7 @@ src = "src"
 tests = "tests"
 all = "src tests"
 module = "gale_shapley_algorithm"
-ruff = "0.16.3"
+ruff = "0.17.1"
 
 [tool.taskipy.tasks]
 # Module runner

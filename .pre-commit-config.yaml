@@ -1,6 +1,7 @@
 # Pre-commit hooks for gale-shapley-algorithm
 # Install: uvx pre-commit install
 # Run all: uvx pre-commit run --all-files
+# The hooks call the taskipy tasks so they use the same pinned ruff as CI (`ruff` in pyproject.toml).
 
 repos:
   - repo: local
@@ -8,7 +9,7 @@ repos:
       # Auto-format code on commit
       - id: format
         name: ruff format
-        entry: uvx ruff format --config=config/ruff.toml src tests
+        entry: uvx --from taskipy task format
         language: system
         types: [python]
         pass_filenames: false
@@ -16,7 +17,7 @@ repos:
       # Lint and auto-fix on commit
       - id: lint
         name: ruff check
-        entry: uvx ruff check --config=config/ruff.toml --fix src tests
+        entry: uvx --from taskipy task lint
         language: system
         types: [python]
         pass_filenames: false
