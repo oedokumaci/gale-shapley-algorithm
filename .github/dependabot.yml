@@ -7,6 +7,12 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 5
+    # Indirect dependencies too (the default is direct only). Installing an extra from PyPI
+    # resolves the newest release of everything it pulls in (starlette, pydantic, ...), and
+    # requirements written with extras (uvicorn[standard], mkdocstrings[python]) only get
+    # updated through their uv.lock entries.
+    allow:
+      - dependency-type: "all"
     # Hold new releases for a week before proposing them (time for a compromised
     # release to be yanked). Security updates are not delayed.
     cooldown:
