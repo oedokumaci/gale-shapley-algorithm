@@ -161,6 +161,26 @@ jobs:
     - name: Build sdist and wheel
       run: uv build
 
+    # PyPI rejects a version it already has, while the docker workflow would still push the release
+    # tag, so the tag, the built version (__version__) and CITATION.cff must all agree.
+    - name: Check the version against CITATION.cff and the release tag
+      env:
+        RELEASE_TAG: ${{ github.event.release.tag_name }}
+      run: |
+        wheel="$(basename dist/*.whl)"
+        version="${wheel#gale_shapley_algorithm-}"
+        version="${version%%-*}"
+        citation="$(sed -nE 's/^version: *"?([^"]+)"?$/\1/p' CITATION.cff)"
+        echo "package $version, CITATION.cff $citation, release tag ${RELEASE_TAG:-none}"
+        if [ "$citation" != "$version" ]; then
+          echo "::error file=CITATION.cff::version is $citation but the package version is $version"
+          exit 1
+        fi
+        if [ -n "$RELEASE_TAG" ] && [ "$RELEASE_TAG" != "v$version" ]; then
+          echo "::error::release tag $RELEASE_TAG does not match the package version $version"
+          exit 1
+        fi
+
     # --no-cache: the wheel's file URL is the same from run to run, and uv would otherwise reuse a
     # previously unpacked copy from the restored cache instead of the wheel built above.
     - name: Import every module from the wheel in an isolated environment

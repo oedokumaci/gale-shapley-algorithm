@@ -75,6 +75,7 @@ git pull
 uvx --from taskipy task changelog      # auto-update CHANGELOG.md
 # review CHANGELOG.md and edit if needed
 # update __version__ in src/gale_shapley_algorithm/__init__.py (hatch reads version from here)
+# and version + date-released in CITATION.cff (CI fails a release whose versions disagree)
 git add .
 git commit -m "chore: Release version X.Y.Z"
 git push
