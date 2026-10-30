@@ -6,6 +6,63 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v1.8.2](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.8.2) - 2026-10-30
+
+<small>[Compare with v1.8.1](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.8.1...v1.8.2)</small>
+
+### Bug Fixes
+
+- GUI:
+  - preference grids scroll inside their cards;
+  - the animation carries self-matches forward and counts only proposers;
+  - results show the people that were submitted;
+  - proposer and responder photos are kept separate;
+  - the page survives blocked storage and photos that fail to load;
+  - the animation's keyboard shortcuts no longer steal keys from focused controls, and they keep working after a player button is clicked.
+
+  ([5f5c7a0](https://github.com/oedokumaci/gale-shapley-algorithm/commit/5f5c7a063218cad4937328d0fe01d1d204c52a6a), [4d5420a](https://github.com/oedokumaci/gale-shapley-algorithm/commit/4d5420a894d899572154b6227f06c221f08555e2), [c2cbc7a](https://github.com/oedokumaci/gale-shapley-algorithm/commit/c2cbc7a5b84db9ef1b598a90949e86d51dac54eb), [f9db0b4](https://github.com/oedokumaci/gale-shapley-algorithm/commit/f9db0b4983ad3b25201b547e1c623758b02c2cc8), [3cc94f8](https://github.com/oedokumaci/gale-shapley-algorithm/commit/3cc94f8fb7270c7542f24cdefd1b9cca29b72009), [f0ead33](https://github.com/oedokumaci/gale-shapley-algorithm/commit/f0ead33325bf4ca98e56631d67e9747f4fc1005b), [dfd5db5](https://github.com/oedokumaci/gale-shapley-algorithm/commit/dfd5db5407b00566c29c753c60d7d496a5490885) by oedokumaci)
+
+### Performance
+
+- `Person` caches preference ranks, so the proposal loop no longer scans preference tuples. Each proposal used to cost O(n²), and `create_matching` took tens of seconds at 400 people per side. Results are unchanged ([34fb219](https://github.com/oedokumaci/gale-shapley-algorithm/commit/34fb2197b36f00e7578c4b625c6ba462cb50b9ea) by oedokumaci).
+- `create_matching` pads incomplete preference lists using a set lookup instead of a list scan ([1126429](https://github.com/oedokumaci/gale-shapley-algorithm/commit/112642961045c600e23935c4efee041b0d97f998) by oedokumaci).
+
+### Security
+
+- The Docker image:
+  - runs as a non-root user (UID 10001);
+  - installs only runtime dependencies;
+  - builds the frontend on Node 24 LTS;
+  - pins its base images by digest;
+  - has a health check.
+
+  ([1276ec5](https://github.com/oedokumaci/gale-shapley-algorithm/commit/1276ec518f2bee1cef189d5b702d75721801a766) by oedokumaci)
+- Bump opentelemetry-api to 1.45.2 in the locked environment the Docker image uses (GHSA-xcq7-p3pf-p88h) ([2a7a5fa](https://github.com/oedokumaci/gale-shapley-algorithm/commit/2a7a5faa708b28ef6e9ed3e2d53150c24fcbdb3f) by oedokumaci).
+- Development and test tooling only:
+  - virtualenv to 21.14.13 and filelock to 4.2.4, used by pre-commit;
+  - certifi to 2026.10.23, used by the test client (GHSA-6q48-6c7w-9gw2);
+  - Vite to 8.3.4 with source-map-js 1.2.2, used by the frontend build.
+
+  ([b209531](https://github.com/oedokumaci/gale-shapley-algorithm/commit/b209531963f2b8b575cf3258314fe1e30dea93fe), [4100ad2](https://github.com/oedokumaci/gale-shapley-algorithm/commit/4100ad2ae41f80ca907d1b9cc90f86ae4061b345) by dependabot[bot]; [2a7a5fa](https://github.com/oedokumaci/gale-shapley-algorithm/commit/2a7a5faa708b28ef6e9ed3e2d53150c24fcbdb3f), [bd5506c](https://github.com/oedokumaci/gale-shapley-algorithm/commit/bd5506cc5d17ebf08cdaed6c704e92ea53ebaafb) by oedokumaci)
+
+### Build
+
+- The sdist now contains only the package sources, tests, config, examples, changelog and citation: 48 files instead of 133 ([8d01cd5](https://github.com/oedokumaci/gale-shapley-algorithm/commit/8d01cd5cf2605779f99c29a9f19e1fee31a33cb7) by oedokumaci).
+- The Docker image now uses FastAPI 0.150. Since FastAPI 0.143, OpenTelemetry exporters are no longer set up automatically from `OTEL_*` variables; set `FASTAPI_OTEL_AUTO_CONFIGURE=true` to keep that behavior ([bf6079f](https://github.com/oedokumaci/gale-shapley-algorithm/commit/bf6079f56506e2fb3d039614e512dbf282e1f2e9) by dependabot[bot]).
+- Routine dependency updates (Radix UI 1.8, React 19.3.1, uv 0.13 in the Docker build, GitHub Actions) by dependabot[bot]; see the [full comparison](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.8.1...v1.8.2).
+
+### Docs
+
+- The README notes that the GUI ships in the Docker image, and the API docs give the current reason for the side-size cap ([49e1e9c](https://github.com/oedokumaci/gale-shapley-algorithm/commit/49e1e9c725731ae67fd09ae3f5941754a2e297f7), [0082ecc](https://github.com/oedokumaci/gale-shapley-algorithm/commit/0082ecc19113824ff0ca4cff6b3fc630b7d1c666) by oedokumaci).
+
+### Tests / CI
+
+- The PyPI and Docker release workflows run the full CI first and publish only if it passes. The PyPI upload runs in its own job, the only one with an OIDC token, and every action is pinned to a commit SHA ([b9a0615](https://github.com/oedokumaci/gale-shapley-algorithm/commit/b9a061565d2f437798dd6f747f2daac52f3965e5), [c3e69e8](https://github.com/oedokumaci/gale-shapley-algorithm/commit/c3e69e8e7d0bb0b82858624047b3883f6f2e83e0) by oedokumaci).
+- A release fails before anything is published if its tag, the package version and `CITATION.cff` disagree. The Docker image is now smoke-tested natively on arm64 as well as amd64 ([41f846e](https://github.com/oedokumaci/gale-shapley-algorithm/commit/41f846ec03651d2b4bb5193d58e379d6a6914494), [a25becb](https://github.com/oedokumaci/gale-shapley-algorithm/commit/a25becb9cd23911e32590628a4b662aaaba8b396) by oedokumaci).
+- CI builds the sdist and wheel, imports every module from the installed wheel and runs the tests from the unpacked sdist ([65cc39b](https://github.com/oedokumaci/gale-shapley-algorithm/commit/65cc39b40fea35e74c8fa609cd4ec44067d374c5) by oedokumaci).
+- `create_matching` is checked against the numeric implementation, with a bound on its work ([7aadcd6](https://github.com/oedokumaci/gale-shapley-algorithm/commit/7aadcd6b78165e4f9cd8f2158fd0f4b89acb43b3) by oedokumaci).
+- Dependabot groups security updates and no longer doubles the commit prefix. The pre-commit hooks use the same pinned ruff (now 0.17.1) as CI ([3de07e5](https://github.com/oedokumaci/gale-shapley-algorithm/commit/3de07e561435b3c491a7687c19e2a4b7c9b39ce2), [5d71822](https://github.com/oedokumaci/gale-shapley-algorithm/commit/5d7182246095f41e73551bdd530d5b6edbea95da) by oedokumaci).
+
 ## [v1.8.1](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.8.1) - 2026-10-05
 
 <small>[Compare with v1.8.0](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.8.0...v1.8.1)</small>
