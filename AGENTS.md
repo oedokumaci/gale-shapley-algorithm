@@ -60,6 +60,7 @@ gh pr create                              # 8. Create pull request
 git checkout main && git pull                           # 1. Update main
 uvx --from taskipy task changelog                       # 2. Update CHANGELOG.md
 # update __version__ in src/gale_shapley_algorithm/__init__.py (hatch reads version from here)
+# and version + date-released in CITATION.cff (CI fails a release whose versions disagree)
 git add . && git commit -m "chore: Release vX.Y.Z"     # 3. Commit release
 git push && git tag vX.Y.Z && git push --tags           # 4. Tag and push
 gh release create vX.Y.Z --generate-notes               # 5. GitHub release

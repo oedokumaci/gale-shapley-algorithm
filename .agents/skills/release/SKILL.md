@@ -19,10 +19,10 @@ Perform a full release for this project.
    ```
 3. Read `CHANGELOG.md` and extract the new version number from the latest heading.
 4. Present the changelog diff to the user for review. **Wait for user approval before continuing.**
-5. Update `__version__` in `src/gale_shapley_algorithm/__init__.py` to match the new version (without the `v` prefix).
+5. Update `__version__` in `src/gale_shapley_algorithm/__init__.py` to match the new version (without the `v` prefix), and `version` and `date-released` in `CITATION.cff`.
 6. Stage and commit:
    ```bash
-   git add CHANGELOG.md src/gale_shapley_algorithm/__init__.py
+   git add CHANGELOG.md CITATION.cff src/gale_shapley_algorithm/__init__.py
    git commit -m "chore: Release version X.Y.Z"
    ```
 7. Push, tag, push the tag, and create the GitHub release:
@@ -36,6 +36,6 @@ Perform a full release for this project.
 ## Important
 
 - **Always wait for user approval** after showing the changelog diff before committing.
-- The version in `__init__.py` must match the tag without the `v` prefix (e.g., `__version__ = "1.2.0"` and tag `v1.2.0`).
+- The version in `__init__.py` and `CITATION.cff` must match the tag without the `v` prefix (e.g., `__version__ = "1.2.0"` and tag `v1.2.0`). CI checks this, and a release that fails it publishes nothing.
 - Only changelog-relevant commit types appear: `build`, `deps`, `feat`, `fix`, `refactor`.
 - If there are no releasable commits since the last tag, inform the user and stop.
