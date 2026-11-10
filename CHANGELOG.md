@@ -6,6 +6,28 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v1.8.3](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.8.3) - 2026-11-10
+
+<small>[Compare with v1.8.2](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.8.2...v1.8.3)</small>
+
+### Build
+
+- CI now tests Python 3.14 and 3.15 on Linux, macOS and Windows, and the package lists both in its classifiers ([39cbeb9](https://github.com/oedokumaci/gale-shapley-algorithm/commit/39cbeb9caa82d1b19256d7f8729cc9b6a208eeab), [3c348a1](https://github.com/oedokumaci/gale-shapley-algorithm/commit/3c348a184b61ba018cbc62fa0e78f3097923893f) by oedokumaci).
+- The Docker image's runtime dependencies are up to date: FastAPI 0.162, uvicorn 0.54, Starlette 1.10 and Pydantic 2.14, plus the smaller packages they pull in ([cbec099](https://github.com/oedokumaci/gale-shapley-algorithm/commit/cbec099d0cd15b792ff8300532eda7f3ad4df478), [4b0c491](https://github.com/oedokumaci/gale-shapley-algorithm/commit/4b0c4911bc79760aa4e4cbe69d642664e41b83d8) by oedokumaci; [66db7d5](https://github.com/oedokumaci/gale-shapley-algorithm/commit/66db7d53827b4222e3f3041bfc66f301948ad739) by dependabot[bot]).
+- Routine dependency updates by dependabot[bot]: development and docs tooling, frontend build tools, uv 0.13.7 in the Docker build, and GitHub Actions. See the [full comparison](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.8.2...v1.8.3).
+
+### Security
+
+- Frontend lint tooling only, so neither fix reaches the built UI or the package:
+  - minimatch 11 via an npm override (GHSA-g3hv-75wg-m249);
+  - zod 4.6.7 (GHSA-mrhx-c7xc-m3w5).
+
+  ([5bb7a71](https://github.com/oedokumaci/gale-shapley-algorithm/commit/5bb7a7180479d760a9b890d1ac972d15d7817253), [3a6efc6](https://github.com/oedokumaci/gale-shapley-algorithm/commit/3a6efc6e23499ccb2a40efc41975bc9682e7fc9b) by oedokumaci)
+
+### Tests / CI
+
+- Dependabot now also updates indirect Python dependencies and uvicorn, which it used to skip ([fd1a393](https://github.com/oedokumaci/gale-shapley-algorithm/commit/fd1a393efb0f60db029736199e99e438a6dd2cf5) by oedokumaci).
+
 ## [v1.8.2](https://github.com/oedokumaci/gale-shapley-algorithm/releases/tag/v1.8.2) - 2026-10-30
 
 <small>[Compare with v1.8.1](https://github.com/oedokumaci/gale-shapley-algorithm/compare/v1.8.1...v1.8.2)</small>
