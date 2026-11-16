@@ -1,6 +1,6 @@
 # Base images are pinned by digest; Dependabot's docker ecosystem keeps tags and digests current
 # (it only updates FROM lines, which is why uv gets its own stage instead of COPY --from=<image>).
-FROM ghcr.io/astral-sh/uv:0.13.7@sha256:96f40d3904aad8d0bd010539001d36c8e2188b981e1334471a90c4a1d93bb490 AS uv
+FROM ghcr.io/astral-sh/uv:0.13.8@sha256:5cc1805e2426484abca4ad46ea783bab281fdb225fd82d8ce6d66a81254bac85 AS uv
 
 FROM node:24-slim@sha256:0e0ff40c39bc087845bfb27465a0df4ea419520094bc35842ff83dd8cbe6f9b6 AS frontend
 WORKDIR /app/frontend
@@ -9,7 +9,7 @@ RUN npm ci
 COPY frontend/ .
 RUN npm run build
 
-FROM python:3.13-slim@sha256:3dd7cc108ec1493442514f5c2a871af6af0ec31d768ff6e378a93340c3b3db5f AS builder
+FROM python:3.13-slim@sha256:e48f59cdba69a3cbd9ed2cf0f348d90d45a8d350d98134cf1070bc106ee9ed90 AS builder
 COPY --from=uv /uv /bin/uv
 ENV UV_COMPILE_BYTECODE=1 \
     UV_PYTHON_DOWNLOADS=never
@@ -26,7 +26,7 @@ COPY src/ src/
 RUN uv sync --locked --no-default-groups --extra cli --extra gui \
     && .venv/bin/python -m compileall -q -f --invalidation-mode checked-hash src
 
-FROM python:3.13-slim@sha256:3dd7cc108ec1493442514f5c2a871af6af0ec31d768ff6e378a93340c3b3db5f
+FROM python:3.13-slim@sha256:e48f59cdba69a3cbd9ed2cf0f348d90d45a8d350d98134cf1070bc106ee9ed90
 
 ARG CREATED
 ARG VERSION
